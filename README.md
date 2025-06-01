@@ -18,15 +18,15 @@ If you use FlexiDot in your research, please cite us:
 
 For an overview of FlexiDot version updates please see the [code history](https://github.com/flexidot-bio/flexidot/blob/master/CHANGELOG.md).
 
-Corresponding [parameter cheat sheets](https://github.com/flexidot-bio/flexidot/tree/master/documentation) are available as well.
+Corresponding [parameter cheat sheets](https://github.com/flexidot-bio/flexidot/tree/master/docs) are available as well.
 
 ## Documentation
 
-* [in depth documentation](https://github.com/flexidot-bio/flexidot/blob/master/documentation/SupplementaryData.pdf) (This readme gives an overview, and more detail is in the documentation.)
-* [parameter cheat sheet](https://github.com/flexidot-bio/flexidot/blob/master/documentation/usage_v1.06.pdf)
-* [artificial test sequences used for the examples](https://github.com/flexidot-bio/flexidot/tree/master/test-data)
-* [example: adding annotation-based shading to a dotplot](https://github.com/flexidot-bio/flexidot/blob/master/documentation/tutorial_add_annotation.md)
-* [presentation slides introducing dotplots and our FlexiDot tool](https://zenodo.org/record/2558556)
+* [In depth documentation](https://github.com/flexidot-bio/flexidot/blob/master/docs/SupplementaryData.pdf) (This readme gives an overview, and more detail is in the documentation.)
+* [Parameter cheat sheet v1.0.6](https://github.com/flexidot-bio/flexidot/blob/master/docs/usage_v1.06.pdf)
+* [Artificial test sequences used for the examples](https://github.com/flexidot-bio/flexidot/tree/master/tests/test-data)
+* [Example: Adding annotation-based shading to a dotplot](https://github.com/flexidot-bio/flexidot/blob/master/docs/tutorial_add_annotation.md)
+* [Presentation slides introducing dotplots and our FlexiDot tool](https://zenodo.org/record/2558556)
 
 ## Implementation
 
@@ -217,7 +217,7 @@ flexidot -i Seq1.fasta Seq4.fasta -m 1 -k 10 -w -S 2
 
 ### Annotation-based shading
 
-Note: See also [**our tutorial**](https://github.com/flexidot-bio/flexidot/blob/master/documentation/tutorial_add_annotation.md) on how to integrate annotation shadings with a real-life example.
+Note: See also [**our tutorial**](https://github.com/flexidot-bio/flexidot/blob/master/docs/tutorial_add_annotation.md) on how to integrate annotation shadings with a real-life example.
 
 In FlexiDot self dotplots, annotated sequence regions can be highlighted by **shading** to allow clear assignment of dotplot regions to specific sequence contexts (see Seq2 in self dotplots). The underlying **annotation** information must be provided in general feature format (**gff3**), either as individual file or file list via the `-g/--input_gff_files` option. To customize GFF-based shading, a user-defined configuration file can be provided via the `-G/--gff_color_config option`. Example files are provided in the test-data directory. Please note, that a legend is generated in a separate file.
 
