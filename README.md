@@ -1,3 +1,6 @@
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/flexidot/badges/version.svg)](https://anaconda.org/bioconda/flexidot)
+[![License Badge](https://anaconda.org/bioconda/flexidot/badges/license.svg)](https://anaconda.org/bioconda/flexidot)
+
 # FlexiDot: Highly customizable, ambiguity-aware dotplots for visual sequence analyses
 
 ![alt text](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplots_banner4.png "FlexiDot self dotplots")
