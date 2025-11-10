@@ -16,6 +16,8 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.x'
+      - name: Install keyring backend
+        run: pip install keyring keyrings.alt
       - name: Install Hatch
         run: pip install hatch
       - name: Build the package with Hatch
