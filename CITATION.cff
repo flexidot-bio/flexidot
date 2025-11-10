@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "flexidot"
-version: 2.0.0
-date-released: 2025-22-05
+version: 2.0.2
+date-released: 2025-11-10
 authors:
   - family-names: Seibt
     given-names: Kathrin M
