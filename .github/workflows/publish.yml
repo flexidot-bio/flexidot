@@ -1,35 +1,27 @@
 name: Publish to PyPI
-
 on:
   release:
     types:
       - published
-
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       packages: write
-
     steps:
-    - name: Check out the code
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-
-    - name: Install Hatch
-      run: pip install hatch
-
-    - name: Build the package with Hatch
-      run: hatch build
-
-    - name: Publish to PyPI
-      env:
-        HATCH_INDEX_USER: __token__
-        HATCH_INDEX_AUTH: ${{ secrets.FLEXIDOT_PYPI_TOKEN }}
-      run: hatch publish
+      - name: Check out the code
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+      - name: Install Hatch
+        run: pip install hatch
+      - name: Build the package with Hatch
+        run: hatch build
+      - name: Publish to PyPI
+        env:
+          HATCH_INDEX_USER: __token__
+          HATCH_INDEX_AUTH: ${{ secrets.FLEXIDOT_PYPI_TOKEN }}
+        run: hatch publish
