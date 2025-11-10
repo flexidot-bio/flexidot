@@ -179,8 +179,9 @@ def main():
             line_width=line_width,
         )
         if list_of_png_names:
+            joiner = ',\n\t\t\t'
             logging.info(
-                f'\n-> Image file(s):\t{",\n\t\t\t".join(list_of_png_names)}\n\n{50 * "="}'
+                f'\n-> Image file(s):\t{joiner.join(list_of_png_names)}\n\n{50 * "="}'
             )
         else:
             logging.warning(f'No image files were created!\n\n{50 * "="}\n')
@@ -247,8 +248,9 @@ def main():
                 line_width=line_width,
             )
         if list_of_png_names:
+            joiner = ',\n\t\t\t'
             logging.info(
-                f'\n-> Image file(s):\t{",\n\t\t\t".join(list_of_png_names)}\n\n{50 * "="}'
+                f'\n-> Image file(s):\t{joiner.join(list_of_png_names)}\n\n{50 * "="}'
             )
         else:
             logging.warning(f'No image files were created!\n\n{50 * "="}\n')
@@ -288,8 +290,9 @@ def main():
         )
 
         if list_of_png_names:
+            joiner = ',\n\t\t\t'
             logging.info(
-                f'\n-> Image file(s):\t{",\n\t\t\t".join(list_of_png_names)}\n\n{50 * "="}'
+                f'\n-> Image file(s):\t{joiner.join(list_of_png_names)}\n\n{50 * "="}'
             )
         else:
             logging.warning(f'No image files were created!\n\n{50 * "="}\n')

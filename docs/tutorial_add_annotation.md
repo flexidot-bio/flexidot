@@ -24,7 +24,10 @@ The *config file* defines color, alpha and zoom of each sequence type. Please no
 ## Command:
 
 ```bash
-flexidot -i sSaTar.fas -g sSaTar.gff3 -G sSaTar.config -k 10 -S 1 -T 30 -E 15 -A 2 -C black -f pdf
+# Set path to data in flexidot repo.
+DATA="tests/test-data/sSaTar_example"
+
+flexidot -i $DATA/sSaTar.fas -g $DATA/sSaTar.gff3 -G $DATA/sSaTar.config -k 10 -S 1 -T 30 -E 15 -A 2 -C black -f pdf
 ```
 
 ---
