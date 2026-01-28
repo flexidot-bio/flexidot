@@ -342,28 +342,33 @@ def read_gffs(
         )
         logging.info(text)
 
-    # create color legend
-    colors, alphas = [], []
-    for item in sorted(used_feats):
-        colors.append(color_dict[item][0])
-        alphas.append(color_dict[item][1])
-    legend_figure(
-        colors=colors,
-        lcs_shading_num=len(used_feats),
-        type_nuc=type_nuc,
-        bins=sorted(used_feats),
-        alphas=alphas,
-        gff_legend=True,
-        prefix=prefix,
-        filetype=filetype,
-    )
+    # check if any annotations were found
+    if len(used_feats) == 0:
+        text = 'Warning: No annotation records found in GFF file(s). Plot will be generated without annotations.\n'
+        logging.warning(text)
+    else:
+        # create color legend
+        colors, alphas = [], []
+        for item in sorted(used_feats):
+            colors.append(color_dict[item][0])
+            alphas.append(color_dict[item][1])
+        legend_figure(
+            colors=colors,
+            lcs_shading_num=len(used_feats),
+            type_nuc=type_nuc,
+            bins=sorted(used_feats),
+            alphas=alphas,
+            gff_legend=True,
+            prefix=prefix,
+            filetype=filetype,
+        )
 
-    # print settings
-    text = 'GFF Feature Types: %s\nGFF Colors:        %s' % (
-        ', '.join(sorted(used_feats)),
-        ', '.join(sorted(colors)),
-    )
-    logging.info(text)
+        # print settings
+        text = 'GFF Feature Types: %s\nGFF Colors:        %s' % (
+            ', '.join(sorted(used_feats)),
+            ', '.join(sorted(colors)),
+        )
+        logging.info(text)
 
     return feat_dict
 
@@ -547,6 +552,12 @@ def legend_figure(
     if alphas is None:
         alphas = []
         alphas = [1] * len(colors)
+
+    # handle empty colors list
+    if len(colors) == 0:
+        text = 'Warning: No colors provided for legend. Skipping legend creation.\n'
+        logging.warning(text)
+        return None
 
     # legend data points
     data_points = list(range(len(colors)))
