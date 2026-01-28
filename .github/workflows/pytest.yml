@@ -8,7 +8,7 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
       # Checkout the latest commit associated with the PR
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Debug matrix value
         run: echo "Python version is ${{ matrix.python-version }}"
       # Set up Miniconda
