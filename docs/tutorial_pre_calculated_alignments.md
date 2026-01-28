@@ -26,7 +26,8 @@ BLAST6 is the tabular output format from BLAST (output format 6). It contains 12
 | 12 | Bit score |
 
 Example BLAST6 file:
-```
+
+```text
 seq1	seq2	95.5	100	4	1	1	100	1	100	1e-50	180
 seq1	seq2	90.0	50	5	0	150	199	200	249	1e-20	90
 ```
@@ -51,7 +52,8 @@ PAF is the output format used by Minimap2 and other modern aligners. It contains
 | 12 | Mapping quality |
 
 Example PAF file:
-```
+
+```text
 seq1	1000	0	100	+	seq2	1200	0	100	95	100	60
 seq1	1000	149	199	+	seq2	1200	199	249	45	50	30
 ```
@@ -102,53 +104,65 @@ flexidot -i sequences.fasta -a alignments.paf --min_identity 90 --min_length 50 
 ### Using BLASTN
 
 ```bash
-# Create a BLAST database
-makeblastdb -in sequences.fasta -dbtype nucl
+# Create blast database
+mkdir db
+makeblastdb -in sequences.fasta -dbtype nucl -out db/sequences_db -parse_seqids
 
 # Run BLASTN with output format 6
-blastn -query sequences.fasta -db sequences.fasta -outfmt 6 -out alignments.blast6 -evalue 1e-10
+blastn -query sequences.fasta -db db/sequences_db -outfmt 6 -out alignments.blast6 \
+-word_size 4 -evalue 1e-3 -perc_identity 60.0 -max_target_seqs 10000 -num_threads 8
 ```
 
 ### Using Minimap2
 
 ```bash
-# Run minimap2 for nucleotide sequences
-minimap2 -x asm5 sequences.fasta sequences.fasta > alignments.paf
+# Run minimap2 for nucleotide sequences (5% divergence)
+minimap2 -x asm5 -t 8 sequences.fasta sequences.fasta > alignments.paf
 
-# For more sensitive alignments
-minimap2 -x asm20 -c sequences.fasta sequences.fasta > alignments.paf
+# For more sensitive alignments (20% divergence, -c outputs CIGAR)
+minimap2 -x asm20 -t 8 -c sequences.fasta sequences.fasta > alignments.paf
 ```
 
 ## Example Workflow
 
 Here's a complete workflow comparing k-mer matching with pre-calculated alignments:
 
-### 1. Standard K-mer Matching
+### 1. Test case data
+
+```bash
+SEQ="tests/test-data/sSaTar_example/sSaTar.fas"
+ANNOTATION="tests/test-data/sSaTar_example/sSaTar.gff3"
+COLOURS="tests/test-data/sSaTar_example/sSaTar.config"
+```
+
+
+### 2. Standard K-mer Matching
 
 ```bash
 # Use FlexiDot's built-in k-mer matching
-flexidot -i sequences.fasta -m 2 -k 15 -o kmer_dotplot
+flexidot -i $SEQ -m 2 -k 15 -o kmer_dotplot --gff $ANNOTATION --gff_color_config $COLOURS
 ```
 
-### 2. Using BLAST Alignments
+### 3. Using BLAST Alignments
 
 ```bash
 # Generate BLAST alignments
-makeblastdb -in sequences.fasta -dbtype nucl
-blastn -query sequences.fasta -db sequences.fasta -outfmt 6 -out alignments.blast6
+blastn -query $SEQ -subject $SEQ -outfmt 6 -word_size 4 -perc_identity 60.0 -max_target_seqs 10000 -evalue 0.001 -out alignments.blast6
 
 # Plot alignments
-flexidot -i sequences.fasta -a alignments.blast6 -m 2 -o blast_dotplot
+flexidot -i $SEQ -m 2 -a alignments.blast6 -m 2 -o blast_dotplot --gff $ANNOTATION --gff_color_config $COLOURS --min_identity 80 --min_length 20
 ```
 
 ### 3. Using Minimap2 Alignments
 
 ```bash
 # Generate minimap2 alignments
-minimap2 -x asm5 sequences.fasta sequences.fasta > alignments.paf
+# Note: Minimap2 is not particularly well suited to detecting small secondary alignments in small sequences.
+# Try tinkering with settings: -k 10 --eqx -N 1000 -p 0.05 -r 2k
+minimap2 -x asm20 $SEQ $SEQ > alignments.paf
 
 # Plot alignments
-flexidot -i sequences.fasta -a alignments.paf -m 2 -o minimap_dotplot
+flexidot -i $SEQ -a alignments.paf -m 2 -o minimap_dotplot --gff $ANNOTATION --gff_color_config $COLOURS
 ```
 
 ## Tips and Best Practices
@@ -159,7 +173,7 @@ flexidot -i sequences.fasta -a alignments.paf -m 2 -o minimap_dotplot
 
 3. **Self-Alignments**: Self-alignments (sequence aligned to itself) are preserved and can be useful for identifying repeats within sequences.
 
-4. **Strand Information**: 
+4. **Strand Information**:
    - In BLAST6 format, strand is determined by the subject coordinates (start > end indicates reverse strand).
    - In PAF format, strand is explicitly provided in column 5 (+/-).
 
@@ -180,7 +194,7 @@ flexidot -i sequences.fasta -a alignments.paf -m 2 -o minimap_dotplot
 
 ### Common Issues
 
-1. **No alignments plotted**: 
+1. **No alignments plotted**:
    - Check that sequence names in the alignment file match the FASTA headers
    - Verify the alignment file format is correct
    - Try relaxing the `--min_identity` or `--min_length` filters
