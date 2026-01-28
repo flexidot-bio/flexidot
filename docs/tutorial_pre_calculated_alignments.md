@@ -1,6 +1,6 @@
 # Plotting Pre-calculated Alignments
 
-FlexiDot now supports plotting pre-calculated alignments from external alignment tools like BLAST and Minimap2. This feature allows you to visualize alignments that have been generated using more sensitive or specialized alignment algorithms, rather than relying solely on k-mer matching.
+FlexiDot now supports plotting pre-calculated alignments from external alignment tools like blastn, Nucmer, and Minimap2. This feature allows you to visualize alignments that have been generated using more sensitive or specialized alignment algorithms, rather than relying solely on k-mer matching.
 
 ## Supported Alignment Formats
 
@@ -119,8 +119,19 @@ blastn -query sequences.fasta -db db/sequences_db -outfmt 6 -out alignments.blas
 # Run minimap2 for nucleotide sequences (5% divergence)
 minimap2 -x asm5 -t 8 sequences.fasta sequences.fasta > alignments.paf
 
-# For more sensitive alignments (20% divergence, -c outputs CIGAR)
-minimap2 -x asm20 -t 8 -c sequences.fasta sequences.fasta > alignments.paf
+# For more sensitive alignments (20% divergence)
+minimap2 -x asm20 -t 8 sequences.fasta sequences.fasta > alignments.paf
+```
+
+### Using Nucmer
+
+```bash
+# Self-alignment with nucmer (use --nosimplify for repeats in self alignments)
+nucmer --maxmatch --nosimplify --minmatch 15 --mincluster 20 --diagfactor 0.3 \
+--prefix self_align sequences.fasta sequences.fasta
+
+# Convert directly using paftools (if installed with minimap2)
+paftools.js delta2paf self_align.delta > self_align.paf
 ```
 
 ## Example Workflow
@@ -133,6 +144,7 @@ Here's a complete workflow comparing k-mer matching with pre-calculated alignmen
 SEQ="tests/test-data/sSaTar_example/sSaTar.fas"
 ANNOTATION="tests/test-data/sSaTar_example/sSaTar.gff3"
 COLOURS="tests/test-data/sSaTar_example/sSaTar.config"
+COLORS=$COLOURS
 ```
 
 
@@ -153,12 +165,26 @@ blastn -query $SEQ -subject $SEQ -outfmt 6 -word_size 4 -perc_identity 60.0 -max
 flexidot -i $SEQ -m 2 -a alignments.blast6 -m 2 -o blast_dotplot --gff $ANNOTATION --gff_color_config $COLOURS --min_identity 80 --min_length 20
 ```
 
-### 3. Using Minimap2 Alignments
+### 3. Using PAF alignments from Nucmer
+
+```bash
+# Self-alignment with nucmer (use --nosimplify for repeats in self alignments)
+nucmer --maxmatch --nosimplify --minmatch 15 --mincluster 20 --diagfactor 0.3 \
+--prefix self_align $SEQ $SEQ
+
+# Convert directly using paftools (if installed with minimap2)
+paftools.js delta2paf self_align.delta > self_align.paf
+
+# Plot alignments
+flexidot -i $SEQ -a self_align.paf -m 2 -o nucmer_dotplot --gff $ANNOTATION --gff_color_config $COLOURS
+```
+
+### 4. Using Minimap2 Alignments
 
 ```bash
 # Generate minimap2 alignments
 # Note: Minimap2 is not particularly well suited to detecting small secondary alignments in small sequences.
-# Try tinkering with settings: -k 10 --eqx -N 1000 -p 0.05 -r 2k
+# Try tinkering with settings: -k 10 -N 1000 -p 0.05 -r 2k, or use Nucmer.
 minimap2 -x asm20 $SEQ $SEQ > alignments.paf
 
 # Plot alignments
