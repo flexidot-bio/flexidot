@@ -66,7 +66,7 @@ def extract_gff_annotation_types(
             logging.warning(f'GFF file not found: {gff_file}')
             continue
 
-        with open(gff_file, 'r') as f:
+        with open(gff_file, 'r', encoding='utf-8') as f:
             for line in f:
                 if not line.startswith('#') and line.strip():
                     fields = line.strip().split('\t')
@@ -85,8 +85,8 @@ def extract_gff_annotation_types(
     if 'others' not in gff_feat_colors:
         gff_feat_colors['others'] = ('grey', 0.5, 0)
 
-    # Log the auto-generated colors
-    if gff_feat_colors:
+    # Log the auto-generated colors only if annotation types were found
+    if annotation_types:
         logging.warning(
             'No GFF color config file provided. Auto-generating colors for annotation types.\n'
             'Consider using --gff_color_config for custom colors.\n'

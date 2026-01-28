@@ -1195,8 +1195,8 @@ def polydotplot(
 
     # write lcs lengths to file
     lcs_data_file = open(
-        '%sPolydotplot_lcs_data_file%s.txt'
-        % (prefix, suffix.replace('_scaled', '').replace('_collage', '')),
+        '%sPolydotplot%s_lcs_data_file%s.txt'
+        % (prefix, wordsize_suffix, suffix.replace('_scaled', '').replace('_collage', '')),
         'w',
     )
     lcs_data_file.write(
