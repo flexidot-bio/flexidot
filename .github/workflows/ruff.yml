@@ -9,7 +9,7 @@ jobs:
       contents: write # Allows reading and writing repository contents (e.g., commits)
       pull-requests: write # Allows reading and writing pull requests
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}

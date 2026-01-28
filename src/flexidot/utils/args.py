@@ -126,6 +126,32 @@ def parse_args():
         help='Limit pairwise comparisons to the 1st sequence only (if plotting mode=1 paired.)',
     )
 
+    # Pre-calculated alignments
+    parser.add_argument(
+        '-a',
+        '--alignment_file',
+        default=None,
+        help='Pre-calculated alignment file (BLAST6 or PAF format). When provided, alignments from this file will be plotted instead of performing k-mer matching.',
+    )
+    parser.add_argument(
+        '--alignment_format',
+        choices=['blast6', 'paf'],
+        default=None,
+        help="Format of the alignment file: 'blast6' or 'paf'. If not specified, format is auto-detected from file extension.",
+    )
+    parser.add_argument(
+        '--min_identity',
+        type=float,
+        default=0.0,
+        help='Minimum percent identity for filtering alignments (0-100). Default: 0.0',
+    )
+    parser.add_argument(
+        '--min_length',
+        type=int,
+        default=0,
+        help='Minimum alignment length for filtering. Default: 0',
+    )
+
     # Graphic formatting
     parser.add_argument('-A', '--line_width', type=float, default=1, help='Line width')
 

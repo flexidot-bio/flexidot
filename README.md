@@ -72,7 +72,7 @@ conda install -c bioconda flexidot
 pip install the latest development version directly from this repo.
 
 ```bash
-% pip install git+https://github.com/flexidot-bio/flexidot.git
+pip install git+https://github.com/flexidot-bio/flexidot.git
 ```
 
 Test installation.
@@ -108,7 +108,11 @@ pre-commit install
 
 ## Use FlexiDot
 
+### Processing fasta files
+
 Flexidot accepts one or more uncompressed fasta files as input. The files can contain multiple sequences.
+
+By default, Flexidot will use shared k-mers between sequence pairs to generate the dot-plot.
 
 ```bash
 # Use individual fasta file (can contain multiple sequences)
@@ -124,6 +128,34 @@ flexidot -i *.fasta [optional arguments]
 Optional arguments are explained below and in detail with the `--help` option.
 
 Importantly, `-k` defines the word size (e.g. `-k 10`) and `-t` specifies the sequence type (`-t nuc` for DNA [default]; `-t aa` for proteins). The plotting mode is chosen via `-m` and described below.
+
+### Processing pre-computed alignments
+
+Flexidot can also process pre-calculated alignments from tools such as `blastn`, `nucmer`, or `minimap2`.
+This approach is often faster than k-mer indexing and is tolerant of gaps and mismatches.
+
+[See pre-calculated alignment tutorial](docs/tutorial_pre_calculated_alignments.md) for detailed examples.
+
+```bash
+# Run BLASTN with output format 6
+blastn -query sequence.fasta -subject sequence.fasta -outfmt 6 -out alignments.blast6 \
+-word_size 4 -evalue 1e-3 -perc_identity 60.0 -max_target_seqs 10000
+
+# Plot alignments
+flexidot -i sequence.fasta -m 2 -a alignments.blast6 -o blast_dotplot
+
+### Using Nucmer
+
+# Self-alignment with nucmer (use --nosimplify for repeats in self alignments)
+nucmer --maxmatch --nosimplify --minmatch 15 --mincluster 20 --diagfactor 0.3 \
+--prefix self_align sequence.fasta sequence.fasta
+
+# Convert directly using paftools (if installed with minimap2)
+paftools.js delta2paf self_align.delta > self_align.paf
+
+# Plot alignments
+flexidot -i sequence.fasta -a self_align.paf -o nucmer_dotplot
+```
 
 ## Plotting modes
 

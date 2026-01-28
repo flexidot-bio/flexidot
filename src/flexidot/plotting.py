@@ -10,6 +10,7 @@ import matplotlib.patches as patches
 import numpy as np
 import pylab as P
 
+from flexidot.utils.alignments import alignments_to_coordinates
 from flexidot.utils.file_handling import legend_figure, read_gffs, read_matrix, read_seq
 from flexidot.utils.matching import find_match_pos_diag, find_match_pos_regex
 from flexidot.utils.utils import (
@@ -23,6 +24,7 @@ from flexidot.utils.utils import (
 def selfdotplot(
     input_fasta,
     wordsize,
+    alignments=None,
     alphabetic_sorting=False,
     convert_wobbles=False,
     filetype='png',
@@ -160,6 +162,9 @@ def selfdotplot(
     if multi:
         suffix += '_collage'
 
+    # Create wordsize suffix only when not using pre-calculated alignments
+    wordsize_suffix = '' if alignments is not None else '_wordsize%i' % wordsize
+
     # calculate fig ratios
     if not multi:
         ncols = 1
@@ -187,7 +192,12 @@ def selfdotplot(
         length_seq = len(seq_one)
 
         # get positions of matches
-        if substitution_count != 0:
+        if alignments is not None:
+            # Use pre-calculated alignments
+            x_lists, y_lists, x_lists_rc, y_lists_rc = alignments_to_coordinates(
+                alignments, seq_name, seq_name, length_seq
+            )
+        elif substitution_count != 0:
             # print "RE"
             x_lists, y_lists, x_lists_rc, y_lists_rc = find_match_pos_regex(
                 seq_one,
@@ -306,10 +316,10 @@ def selfdotplot(
                 )  # space between rows - def 0.4
 
                 # name and create output files (names derived from SEQNAME)
-                fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+                fig_name = '%s%s%s%s-%.3d.%s' % (
                     prefix,
                     name_graph,
-                    wordsize,
+                    wordsize_suffix,
                     suffix,
                     page_counter,
                     filetype,
@@ -404,14 +414,14 @@ def selfdotplot(
             )
 
             # name and create output files (names derived from SEQNAME)
-            fig_name = '%s%s-%d_%s_wordsize%i%s.%s' % (
+            fig_name = '%s%s-%d_%s%s%s.%s' % (
                 prefix,
                 name_graph,
                 counter,
                 shorten_name(
                     name_seq, max_len=title_length, title_clip_pos=title_clip_pos
                 ),
-                wordsize,
+                wordsize_suffix,
                 suffix,
                 filetype,
             )
@@ -433,10 +443,10 @@ def selfdotplot(
         P.subplots_adjust(hspace=0.5, wspace=0.5)  # space between rows - def 0.4
 
         # name and create output files (names derived from SEQNAME)
-        fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+        fig_name = '%s%s%s%s-%.3d.%s' % (
             prefix,
             name_graph,
-            wordsize,
+            wordsize_suffix,
             suffix,
             page_counter,
             filetype,
@@ -456,6 +466,7 @@ def selfdotplot(
 def pairdotplot(
     input_fasta,
     wordsize,
+    alignments=None,
     alphabetic_sorting=False,
     convert_wobbles=False,
     filetype='png',
@@ -579,6 +590,9 @@ def pairdotplot(
     if multi:
         suffix += '_collage'
 
+    # Create wordsize suffix only when not using pre-calculated alignments
+    wordsize_suffix = '' if alignments is not None else '_wordsize%i' % wordsize
+
     # calculate fig ratios
     if not multi:
         ncols = 1
@@ -593,8 +607,12 @@ def pairdotplot(
 
     # prepare LCS data file
     lcs_data_file = open(
-        '%sPairdotplot_wordsize%d_lcs_data_file%s.txt'
-        % (prefix, wordsize, suffix.replace('_scaled', '').replace('_collage', '')),
+        '%sPairdotplot%s_lcs_data_file%s.txt'
+        % (
+            prefix,
+            wordsize_suffix,
+            suffix.replace('_scaled', '').replace('_collage', ''),
+        ),
         'w',
     )
     lcs_data_file.write(
@@ -642,7 +660,20 @@ def pairdotplot(
                 log_txt += ' ' + str(seq_counter)
 
             # get positions of matches
-            if substitution_count != 0:
+            if alignments is not None:
+                # Use pre-calculated alignments
+                x1, y1, x2, y2 = alignments_to_coordinates(
+                    alignments, name_one, name_two, len_two
+                )
+                # Calculate LCS from alignment lengths (use longest alignment)
+                # Each element in x1/x2 is a numpy array of [start, end]
+                lcs_for = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x1 if len(x) > 1), default=0
+                )
+                lcs_rev = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x2 if len(x) > 1), default=0
+                )
+            elif substitution_count != 0:
                 # print "RE"
                 x1, y1, x2, y2, lcs_for, lcs_rev = find_match_pos_regex(
                     seq_one,
@@ -829,10 +860,10 @@ def pairdotplot(
                     )  # space between rows - def 0.4
 
                 # name and create output files (names derived from SEQNAME)
-                fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+                fig_name = '%s%s%s%s-%.3d.%s' % (
                     prefix,
                     name_graph,
-                    wordsize,
+                    wordsize_suffix,
                     suffix,
                     page_counter,
                     filetype,
@@ -872,11 +903,11 @@ def pairdotplot(
                     )  # space between rows - def 0.4
 
                 # name and create output files
-                fig_name = '%s%s-%d_wordsize%i%s.%s' % (
+                fig_name = '%s%s-%d%s%s.%s' % (
                     prefix,
                     name_graph,
                     counter,
-                    wordsize,
+                    wordsize_suffix,
                     suffix,
                     filetype,
                 )
@@ -909,10 +940,10 @@ def pairdotplot(
             )  # space between rows - def 0.4
 
         # name and create output files (names derived from SEQNAME)
-        fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+        fig_name = '%s%s%s%s-%.3d.%s' % (
             prefix,
             name_graph,
-            wordsize,
+            wordsize_suffix,
             suffix,
             page_counter,
             filetype,
@@ -934,6 +965,7 @@ def pairdotplot(
 def polydotplot(
     input_fasta,
     wordsize=10,
+    alignments=None,
     gff_files=None,
     alphabetic_sorting=False,
     convert_wobbles=False,
@@ -1151,6 +1183,9 @@ def polydotplot(
         elif 'ref2' in suffix:
             suffix = suffix.replace('ref2', '%daa' % lcs_shading_interval_len)
 
+    # Create wordsize suffix only when not using pre-calculated alignments
+    wordsize_suffix = '' if alignments is not None else '_wordsize%i' % wordsize
+
     # name and create output files (names derived from SEQNAME)
     if prefix:
         prefix = str(prefix) + '-'
@@ -1168,8 +1203,12 @@ def polydotplot(
 
     # write lcs lengths to file
     lcs_data_file = open(
-        '%sPolydotplot_lcs_data_file%s.txt'
-        % (prefix, suffix.replace('_scaled', '').replace('_collage', '')),
+        '%sPolydotplot%s_lcs_data_file%s.txt'
+        % (
+            prefix,
+            wordsize_suffix,
+            suffix.replace('_scaled', '').replace('_collage', ''),
+        ),
         'w',
     )
     lcs_data_file.write(
@@ -1239,7 +1278,19 @@ def polydotplot(
                     log_txt += str(counter)
 
             # Get positions of matches &  length of longest common substring based on match lengths
-            if substitution_count != 0:
+            if alignments is not None:
+                # Use pre-calculated alignments
+                x1, y1, x2, y2 = alignments_to_coordinates(
+                    alignments, name_one, name_two, len_two
+                )
+                # Calculate LCS from alignment lengths (use longest alignment)
+                lcs_for = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x1 if len(x) > 1), default=0
+                )
+                lcs_rev = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x2 if len(x) > 1), default=0
+                )
+            elif substitution_count != 0:
                 # print "RE"
                 x1, y1, x2, y2, lcs_for, lcs_rev = find_match_pos_regex(
                     seq_one,
@@ -1935,7 +1986,7 @@ def polydotplot(
         )  # space between rows - def 0.4
 
     # save figure and close instance
-    fig_name = '%s%s_wordsize%i%s.%s' % (prefix, name_graph, wordsize, suffix, filetype)
+    fig_name = '%s%s%s%s.%s' % (prefix, name_graph, wordsize_suffix, suffix, filetype)
     P.savefig(fig_name)
     P.close()
     P.cla()
