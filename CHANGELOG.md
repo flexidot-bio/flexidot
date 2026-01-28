@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] 2026-01-28
+
+### Changed
+
+- Bump third-party dependency versions in GitHub actions.
+- Update badges in README.
+- Add star tracker in README.
+- Remove deps from environment yaml that are installed as pip dependencies of flexidot.
+- Bump LICENSE to GPL-3
+
+### Added
+
+- Support for pre-computed alignments in blast6 or PAF format.
+- Tests for new features.
+- Tutorial for generating alignments with blastn, nucmer, and minimap2.
+
+### Fixed
+
+- Error when GFF supplied without colour config file.
+
 ## [2.0.2] 2025-11-10
 
 ### Changed
