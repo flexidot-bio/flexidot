@@ -10,7 +10,7 @@ from flexidot.plotting import pairdotplot, polydotplot, selfdotplot
 from flexidot.utils.alignments import load_alignments
 from flexidot.utils.args import parse_args
 from flexidot.utils.checks import check_kmer_length, print_summary
-from flexidot.utils.file_handling import read_gff_color_config
+from flexidot.utils.file_handling import extract_gff_annotation_types, read_gff_color_config
 from flexidot.utils.logs import init_logging
 
 # Matplotlib settings
@@ -134,6 +134,9 @@ def main():
                 f'Reading GFF color configuration file: {gff_color_config_file}'
             )
             gff_feat_colors = read_gff_color_config(gff_color_config_file)
+        else:
+            # Auto-generate colors from annotation types in GFF files
+            gff_feat_colors = extract_gff_annotation_types(gff)
     else:
         gff_feat_colors = {}
         if gff_color_config_file:

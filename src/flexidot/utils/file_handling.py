@@ -1,9 +1,101 @@
 import logging
 import os
+from typing import Dict, List, Tuple, Union
 
 from Bio import SeqIO
 import matplotlib.colors as mcolors
 import pylab as P
+
+
+# Default color palette for auto-generated GFF colors
+_DEFAULT_GFF_COLORS = [
+    '#e41a1c',  # red
+    '#377eb8',  # blue
+    '#4daf4a',  # green
+    '#984ea3',  # purple
+    '#ff7f00',  # orange
+    '#ffff33',  # yellow
+    '#a65628',  # brown
+    '#f781bf',  # pink
+    '#999999',  # grey
+    '#66c2a5',  # teal
+    '#fc8d62',  # coral
+    '#8da0cb',  # light blue
+    '#e78ac3',  # light pink
+    '#a6d854',  # lime
+    '#ffd92f',  # gold
+    '#e5c494',  # tan
+    '#b3b3b3',  # silver
+]
+
+
+def extract_gff_annotation_types(
+    gff_files: Union[str, List[str]],
+) -> Dict[str, Tuple[str, float, int]]:
+    """
+    Extract unique annotation types from GFF3 files and generate auto-colors.
+
+    When no GFF color config file is provided, this function extracts all unique
+    annotation types (column 3) from the GFF files and assigns a unique color
+    to each type.
+
+    Parameters
+    ----------
+    gff_files : str or list of str
+        Path(s) to GFF3 file(s).
+
+    Returns
+    -------
+    dict
+        Dictionary with annotation type as key (lowercase) and tuple
+        (color, alpha, zoom) as value.
+
+    Examples
+    --------
+    >>> colors = extract_gff_annotation_types(['annotations.gff3'])
+    >>> print(colors)
+    {'micro': ('#e41a1c', 0.7, 0), 'ssatar1': ('#377eb8', 0.7, 0), ...}
+    """
+    if isinstance(gff_files, str):
+        gff_files = [gff_files]
+
+    # Extract unique annotation types from all GFF files
+    annotation_types = set()
+    for gff_file in gff_files:
+        if not os.path.exists(gff_file):
+            logging.warning(f'GFF file not found: {gff_file}')
+            continue
+
+        with open(gff_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if not line.startswith('#') and line.strip():
+                    fields = line.strip().split('\t')
+                    if len(fields) >= 3:
+                        feat_type = fields[2].lower()
+                        annotation_types.add(feat_type)
+
+    # Generate color dictionary with unique colors for each annotation type
+    gff_feat_colors = {}
+    sorted_types = sorted(annotation_types)
+    for idx, feat_type in enumerate(sorted_types):
+        color = _DEFAULT_GFF_COLORS[idx % len(_DEFAULT_GFF_COLORS)]
+        gff_feat_colors[feat_type] = (color, 0.7, 0)
+
+    # Always include 'others' for unknown annotation types
+    if 'others' not in gff_feat_colors:
+        gff_feat_colors['others'] = ('grey', 0.5, 0)
+
+    # Log the auto-generated colors only if annotation types were found
+    if annotation_types:
+        logging.warning(
+            'No GFF color config file provided. Auto-generating colors for annotation types.\n'
+            'Consider using --gff_color_config for custom colors.\n'
+            'Auto-generated colors:'
+        )
+        for feat_type, (color, alpha, zoom) in sorted(gff_feat_colors.items()):
+            logging.info(f'  {feat_type}: {color} (alpha={alpha}, zoom={zoom})')
+
+    return gff_feat_colors
 
 
 def read_seq(input_fasta, degap=False):
