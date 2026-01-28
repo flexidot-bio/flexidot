@@ -608,7 +608,11 @@ def pairdotplot(
     # prepare LCS data file
     lcs_data_file = open(
         '%sPairdotplot%s_lcs_data_file%s.txt'
-        % (prefix, wordsize_suffix, suffix.replace('_scaled', '').replace('_collage', '')),
+        % (
+            prefix,
+            wordsize_suffix,
+            suffix.replace('_scaled', '').replace('_collage', ''),
+        ),
         'w',
     )
     lcs_data_file.write(
@@ -663,8 +667,12 @@ def pairdotplot(
                 )
                 # Calculate LCS from alignment lengths (use longest alignment)
                 # Each element in x1/x2 is a numpy array of [start, end]
-                lcs_for = max((abs(int(x[1]) - int(x[0])) for x in x1 if len(x) > 1), default=0)
-                lcs_rev = max((abs(int(x[1]) - int(x[0])) for x in x2 if len(x) > 1), default=0)
+                lcs_for = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x1 if len(x) > 1), default=0
+                )
+                lcs_rev = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x2 if len(x) > 1), default=0
+                )
             elif substitution_count != 0:
                 # print "RE"
                 x1, y1, x2, y2, lcs_for, lcs_rev = find_match_pos_regex(
@@ -1196,7 +1204,11 @@ def polydotplot(
     # write lcs lengths to file
     lcs_data_file = open(
         '%sPolydotplot%s_lcs_data_file%s.txt'
-        % (prefix, wordsize_suffix, suffix.replace('_scaled', '').replace('_collage', '')),
+        % (
+            prefix,
+            wordsize_suffix,
+            suffix.replace('_scaled', '').replace('_collage', ''),
+        ),
         'w',
     )
     lcs_data_file.write(
@@ -1272,8 +1284,12 @@ def polydotplot(
                     alignments, name_one, name_two, len_two
                 )
                 # Calculate LCS from alignment lengths (use longest alignment)
-                lcs_for = max((abs(int(x[1]) - int(x[0])) for x in x1 if len(x) > 1), default=0)
-                lcs_rev = max((abs(int(x[1]) - int(x[0])) for x in x2 if len(x) > 1), default=0)
+                lcs_for = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x1 if len(x) > 1), default=0
+                )
+                lcs_rev = max(
+                    (abs(int(x[1]) - int(x[0])) for x in x2 if len(x) > 1), default=0
+                )
             elif substitution_count != 0:
                 # print "RE"
                 x1, y1, x2, y2, lcs_for, lcs_rev = find_match_pos_regex(

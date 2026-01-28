@@ -14,7 +14,6 @@ from flexidot.utils.alignments import (
     parse_paf,
 )
 
-
 # Test data paths
 TEST_DATA_DIR = Path(__file__).parent / 'test-data'
 BLAST6_FILE = TEST_DATA_DIR / 'test_alignments.blast6'

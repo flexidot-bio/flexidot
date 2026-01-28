@@ -10,7 +10,10 @@ from flexidot.plotting import pairdotplot, polydotplot, selfdotplot
 from flexidot.utils.alignments import load_alignments
 from flexidot.utils.args import parse_args
 from flexidot.utils.checks import check_kmer_length, print_summary
-from flexidot.utils.file_handling import extract_gff_annotation_types, read_gff_color_config
+from flexidot.utils.file_handling import (
+    extract_gff_annotation_types,
+    read_gff_color_config,
+)
 from flexidot.utils.logs import init_logging
 
 # Matplotlib settings

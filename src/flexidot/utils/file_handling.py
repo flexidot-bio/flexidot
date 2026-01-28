@@ -6,7 +6,6 @@ from Bio import SeqIO
 import matplotlib.colors as mcolors
 import pylab as P
 
-
 # Default color palette for auto-generated GFF colors
 _DEFAULT_GFF_COLORS = [
     '#e41a1c',  # red

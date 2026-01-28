@@ -500,7 +500,9 @@ def load_alignments(
             filepath, min_identity=min_identity, min_length=min_length
         )
     else:
-        raise ValueError(f"Unknown alignment format: {file_format}. Use 'blast6' or 'paf'.")
+        raise ValueError(
+            f"Unknown alignment format: {file_format}. Use 'blast6' or 'paf'."
+        )
 
     if filter_redundant:
         alignments = filter_redundant_alignments(alignments)
@@ -549,8 +551,8 @@ def _detect_alignment_format(filepath: Path) -> str:
             break
 
     raise ValueError(
-        f"Could not auto-detect alignment format for {filepath}. "
-        "Please specify format using --alignment_format option."
+        f'Could not auto-detect alignment format for {filepath}. '
+        'Please specify format using --alignment_format option.'
     )
 
 
