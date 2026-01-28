@@ -1,6 +1,5 @@
 """Tests for alignment parsing and processing functions."""
 
-import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -62,22 +61,28 @@ class TestParseBlast6:
         with pytest.raises(FileNotFoundError):
             parse_blast6('nonexistent_file.blast6')
 
-    def test_parse_blast6_strand_detection(self):
+    def test_parse_blast6_strand_detection(self, tmp_path):
         """Test that strand is correctly determined from subject coordinates."""
         # Create a test file with reverse strand alignment
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.blast6', delete=False) as f:
-            # Forward strand: sstart < send
-            f.write('seq1\tseq2\t95\t100\t5\t0\t1\t100\t1\t100\t1e-50\t180\n')
-            # Reverse strand: sstart > send
-            f.write('seq1\tseq2\t90\t100\t10\t0\t1\t100\t200\t101\t1e-40\t160\n')
-            f.flush()
+        test_file = tmp_path / 'test_strand.blast6'
+        test_file.write_text(
+            'seq1\tseq2\t95\t100\t5\t0\t1\t100\t1\t100\t1e-50\t180\n'
+            'seq1\tseq2\t90\t100\t10\t0\t1\t100\t200\t101\t1e-40\t160\n'
+        )
 
-            alignments = parse_blast6(f.name)
-            assert len(alignments) == 2
-            assert alignments[0]['strand'] == '+'
-            assert alignments[1]['strand'] == '-'
-            # Check that coordinates are normalized for reverse strand
-            assert alignments[1]['subject_start'] < alignments[1]['subject_end']
+        alignments = parse_blast6(test_file)
+        assert len(alignments) == 2
+        assert alignments[0]['strand'] == '+'
+        assert alignments[1]['strand'] == '-'
+        # Check that coordinates are normalized for reverse strand
+        assert alignments[1]['subject_start'] < alignments[1]['subject_end']
+
+    def test_parse_blast6_invalid_min_identity(self):
+        """Test that ValueError is raised for invalid min_identity."""
+        with pytest.raises(ValueError):
+            parse_blast6(BLAST6_FILE, min_identity=150)
+        with pytest.raises(ValueError):
+            parse_blast6(BLAST6_FILE, min_identity=-10)
 
 
 class TestParsePaf:
@@ -99,24 +104,23 @@ class TestParsePaf:
             assert 'length' in aln
             assert 'strand' in aln
 
-    def test_parse_paf_coordinate_conversion(self):
+    def test_parse_paf_coordinate_conversion(self, tmp_path):
         """Test that PAF 0-based coordinates are converted to 1-based."""
         # PAF uses 0-based half-open coordinates
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.paf', delete=False) as f:
-            # 0-based: [0, 100) should become 1-based: [1, 100]
-            f.write('seq1\t1000\t0\t100\t+\tseq2\t1200\t0\t100\t95\t100\t60\n')
-            f.flush()
+        test_file = tmp_path / 'test_coords.paf'
+        # 0-based: [0, 100) should become 1-based: [1, 100]
+        test_file.write_text('seq1\t1000\t0\t100\t+\tseq2\t1200\t0\t100\t95\t100\t60\n')
 
-            alignments = parse_paf(f.name)
-            assert len(alignments) == 1
-            assert alignments[0]['query_start'] == 1
-            assert alignments[0]['query_end'] == 100
-            assert alignments[0]['subject_start'] == 1
-            assert alignments[0]['subject_end'] == 100
+        alignments = parse_paf(test_file)
+        assert len(alignments) == 1
+        assert alignments[0]['query_start'] == 1
+        assert alignments[0]['query_end'] == 100
+        assert alignments[0]['subject_start'] == 1
+        assert alignments[0]['subject_end'] == 100
 
     def test_parse_paf_identity_filter(self):
         """Test filtering alignments by minimum identity."""
-        all_alignments = parse_paf(PAF_FILE, min_identity=0)
+        all_alignments = parse_paf(PAF_FILE)
         filtered_alignments = parse_paf(PAF_FILE, min_identity=92)
         assert len(filtered_alignments) < len(all_alignments)
         for aln in filtered_alignments:
@@ -124,7 +128,7 @@ class TestParsePaf:
 
     def test_parse_paf_length_filter(self):
         """Test filtering alignments by minimum length."""
-        all_alignments = parse_paf(PAF_FILE, min_identity=0)
+        all_alignments = parse_paf(PAF_FILE)
         filtered_alignments = parse_paf(PAF_FILE, min_length=75)
         assert len(filtered_alignments) < len(all_alignments)
         for aln in filtered_alignments:
@@ -141,6 +145,13 @@ class TestParsePaf:
         strands = [aln['strand'] for aln in alignments]
         assert '+' in strands
         assert '-' in strands
+
+    def test_parse_paf_invalid_min_identity(self):
+        """Test that ValueError is raised for invalid min_identity."""
+        with pytest.raises(ValueError):
+            parse_paf(PAF_FILE, min_identity=150)
+        with pytest.raises(ValueError):
+            parse_paf(PAF_FILE, min_identity=-10)
 
 
 class TestFilterRedundantAlignments:

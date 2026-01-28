@@ -62,7 +62,7 @@ def parse_blast6(
     FileNotFoundError
         If the specified file does not exist.
     ValueError
-        If the file format is invalid.
+        If the file format is invalid or min_identity is out of range.
 
     Examples
     --------
@@ -70,6 +70,10 @@ def parse_blast6(
     >>> for aln in alignments:
     ...     print(f"{aln['query_id']} vs {aln['subject_id']}")
     """
+    # Validate min_identity
+    if not 0 <= min_identity <= 100:
+        raise ValueError(f'min_identity must be between 0 and 100, got {min_identity}')
+
     filepath = Path(filepath)
     if not filepath.exists():
         raise FileNotFoundError(f'Alignment file not found: {filepath}')
@@ -183,7 +187,7 @@ def parse_paf(
     FileNotFoundError
         If the specified file does not exist.
     ValueError
-        If the file format is invalid.
+        If the file format is invalid or min_identity is out of range.
 
     Examples
     --------
@@ -191,6 +195,10 @@ def parse_paf(
     >>> for aln in alignments:
     ...     print(f"{aln['query_id']} vs {aln['subject_id']}: {aln['strand']}")
     """
+    # Validate min_identity
+    if not 0 <= min_identity <= 100:
+        raise ValueError(f'min_identity must be between 0 and 100, got {min_identity}')
+
     filepath = Path(filepath)
     if not filepath.exists():
         raise FileNotFoundError(f'Alignment file not found: {filepath}')
