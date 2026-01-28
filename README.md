@@ -1,11 +1,19 @@
-[![Anaconda-Server Badge](https://anaconda.org/bioconda/flexidot/badges/version.svg)](https://anaconda.org/bioconda/flexidot)
-[![License Badge](https://anaconda.org/bioconda/flexidot/badges/license.svg)](https://anaconda.org/bioconda/flexidot)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![PyPI version](https://badge.fury.io/py/flexidot.svg)](https://badge.fury.io/py/flexidot)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/flexidot/README.html)
+[![Downloads](https://pepy.tech/badge/flexidot)](https://pepy.tech/project/flexidot)
 
 # FlexiDot: Highly customizable, ambiguity-aware dotplots for visual sequence analyses
 
 ![alt text](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplots_banner4.png "FlexiDot self dotplots")
 
-FlexiDot is a cross-platform dotplot suite generating high quality self, pairwise and all-against-all visualizations. To improve dotplot suitability for comparison of consensus and error-prone sequences, FlexiDot harbors routines for strict and relaxed handling of mismatches and ambiguous residues. The custom shading modules facilitate dotplot interpretation and motif identification by adding information on sequence annotations and sequence similarities to the images. Combined with collage-like outputs, FlexiDot supports simultaneous visual screening of a large sequence sets, allowing dotplot use for routine screening.
+FlexiDot is a cross-platform dotplot suite generating high quality self, pairwise and all-against-all visualizations of transposons and other discrete sequences.
+
+To improve dotplot suitability for comparison of consensus and error-prone sequences, FlexiDot supports strict (k-mer based) and relaxed handling of mismatches and ambiguous residues, as well as plotting of pre-computed alignments (i.e. from BLAST or Nucmer).
+
+The custom shading modules facilitate dotplot interpretation and feature identification by adding information on feature annotations and sequence similarities to the images.
+
+Combined with collage-like outputs, FlexiDot supports simultaneous visual screening of large sequence sets, allowing dotplot use in routine screening workflows.
 
 ## Citation
 
@@ -17,11 +25,9 @@ If you use FlexiDot in your research, please cite us:
 
 <img align="right" width="100" height="100" src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/FlexiLogo.png">
 
-**Current version (May 2025): FlexiDot v2.0.0**
+**Current version (Jan 2026): FlexiDot v2.1.0**
 
 For an overview of FlexiDot version updates please see the [code history](https://github.com/flexidot-bio/flexidot/blob/master/CHANGELOG.md).
-
-Corresponding [parameter cheat sheets](https://github.com/flexidot-bio/flexidot/tree/master/docs) are available as well.
 
 ## Documentation
 
@@ -326,3 +332,12 @@ flexidot -i Beetle.fas -m 2 -k 10 -S 1 -r -x -u custom_matrix.txt -U
 # Example with test dataset
 flexidot -i test-seqs.fasta -m 2 -k 10 -S 1 -x -u custom_matrix.txt -U
 ```
+
+## License
+
+Software provided under GPL-3 license.
+
+## Star History
+
+[![Star History
+Chart](https://api.star-history.com/svg?repos=flexidot-bio/flexidot&type=Date)](https://star-history.com/#flexidot-bio/flexidot&Date)
