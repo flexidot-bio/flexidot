@@ -162,6 +162,9 @@ def selfdotplot(
     if multi:
         suffix += '_collage'
 
+    # Create wordsize suffix only when not using pre-calculated alignments
+    wordsize_suffix = '' if alignments is not None else '_wordsize%i' % wordsize
+
     # calculate fig ratios
     if not multi:
         ncols = 1
@@ -313,10 +316,10 @@ def selfdotplot(
                 )  # space between rows - def 0.4
 
                 # name and create output files (names derived from SEQNAME)
-                fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+                fig_name = '%s%s%s%s-%.3d.%s' % (
                     prefix,
                     name_graph,
-                    wordsize,
+                    wordsize_suffix,
                     suffix,
                     page_counter,
                     filetype,
@@ -411,14 +414,14 @@ def selfdotplot(
             )
 
             # name and create output files (names derived from SEQNAME)
-            fig_name = '%s%s-%d_%s_wordsize%i%s.%s' % (
+            fig_name = '%s%s-%d_%s%s%s.%s' % (
                 prefix,
                 name_graph,
                 counter,
                 shorten_name(
                     name_seq, max_len=title_length, title_clip_pos=title_clip_pos
                 ),
-                wordsize,
+                wordsize_suffix,
                 suffix,
                 filetype,
             )
@@ -440,10 +443,10 @@ def selfdotplot(
         P.subplots_adjust(hspace=0.5, wspace=0.5)  # space between rows - def 0.4
 
         # name and create output files (names derived from SEQNAME)
-        fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+        fig_name = '%s%s%s%s-%.3d.%s' % (
             prefix,
             name_graph,
-            wordsize,
+            wordsize_suffix,
             suffix,
             page_counter,
             filetype,
@@ -587,6 +590,9 @@ def pairdotplot(
     if multi:
         suffix += '_collage'
 
+    # Create wordsize suffix only when not using pre-calculated alignments
+    wordsize_suffix = '' if alignments is not None else '_wordsize%i' % wordsize
+
     # calculate fig ratios
     if not multi:
         ncols = 1
@@ -601,8 +607,8 @@ def pairdotplot(
 
     # prepare LCS data file
     lcs_data_file = open(
-        '%sPairdotplot_wordsize%d_lcs_data_file%s.txt'
-        % (prefix, wordsize, suffix.replace('_scaled', '').replace('_collage', '')),
+        '%sPairdotplot%s_lcs_data_file%s.txt'
+        % (prefix, wordsize_suffix, suffix.replace('_scaled', '').replace('_collage', '')),
         'w',
     )
     lcs_data_file.write(
@@ -846,10 +852,10 @@ def pairdotplot(
                     )  # space between rows - def 0.4
 
                 # name and create output files (names derived from SEQNAME)
-                fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+                fig_name = '%s%s%s%s-%.3d.%s' % (
                     prefix,
                     name_graph,
-                    wordsize,
+                    wordsize_suffix,
                     suffix,
                     page_counter,
                     filetype,
@@ -889,11 +895,11 @@ def pairdotplot(
                     )  # space between rows - def 0.4
 
                 # name and create output files
-                fig_name = '%s%s-%d_wordsize%i%s.%s' % (
+                fig_name = '%s%s-%d%s%s.%s' % (
                     prefix,
                     name_graph,
                     counter,
-                    wordsize,
+                    wordsize_suffix,
                     suffix,
                     filetype,
                 )
@@ -926,10 +932,10 @@ def pairdotplot(
             )  # space between rows - def 0.4
 
         # name and create output files (names derived from SEQNAME)
-        fig_name = '%s%s_wordsize%i%s-%.3d.%s' % (
+        fig_name = '%s%s%s%s-%.3d.%s' % (
             prefix,
             name_graph,
-            wordsize,
+            wordsize_suffix,
             suffix,
             page_counter,
             filetype,
@@ -1168,6 +1174,9 @@ def polydotplot(
             suffix = suffix.replace('ref2', '%dbp' % lcs_shading_interval_len)
         elif 'ref2' in suffix:
             suffix = suffix.replace('ref2', '%daa' % lcs_shading_interval_len)
+
+    # Create wordsize suffix only when not using pre-calculated alignments
+    wordsize_suffix = '' if alignments is not None else '_wordsize%i' % wordsize
 
     # name and create output files (names derived from SEQNAME)
     if prefix:
@@ -1961,7 +1970,7 @@ def polydotplot(
         )  # space between rows - def 0.4
 
     # save figure and close instance
-    fig_name = '%s%s_wordsize%i%s.%s' % (prefix, name_graph, wordsize, suffix, filetype)
+    fig_name = '%s%s%s%s.%s' % (prefix, name_graph, wordsize_suffix, suffix, filetype)
     P.savefig(fig_name)
     P.close()
     P.cla()
