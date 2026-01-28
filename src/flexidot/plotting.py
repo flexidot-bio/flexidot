@@ -10,6 +10,7 @@ import matplotlib.patches as patches
 import numpy as np
 import pylab as P
 
+from flexidot.utils.alignments import alignments_to_coordinates
 from flexidot.utils.file_handling import legend_figure, read_gffs, read_matrix, read_seq
 from flexidot.utils.matching import find_match_pos_diag, find_match_pos_regex
 from flexidot.utils.utils import (
@@ -23,6 +24,7 @@ from flexidot.utils.utils import (
 def selfdotplot(
     input_fasta,
     wordsize,
+    alignments=None,
     alphabetic_sorting=False,
     convert_wobbles=False,
     filetype='png',
@@ -187,7 +189,12 @@ def selfdotplot(
         length_seq = len(seq_one)
 
         # get positions of matches
-        if substitution_count != 0:
+        if alignments is not None:
+            # Use pre-calculated alignments
+            x_lists, y_lists, x_lists_rc, y_lists_rc = alignments_to_coordinates(
+                alignments, seq_name, seq_name, length_seq
+            )
+        elif substitution_count != 0:
             # print "RE"
             x_lists, y_lists, x_lists_rc, y_lists_rc = find_match_pos_regex(
                 seq_one,
@@ -456,6 +463,7 @@ def selfdotplot(
 def pairdotplot(
     input_fasta,
     wordsize,
+    alignments=None,
     alphabetic_sorting=False,
     convert_wobbles=False,
     filetype='png',
@@ -642,7 +650,16 @@ def pairdotplot(
                 log_txt += ' ' + str(seq_counter)
 
             # get positions of matches
-            if substitution_count != 0:
+            if alignments is not None:
+                # Use pre-calculated alignments
+                x1, y1, x2, y2 = alignments_to_coordinates(
+                    alignments, name_one, name_two, len_two
+                )
+                # Calculate LCS from alignment lengths (use longest alignment)
+                # Each element in x1/x2 is a numpy array of [start, end]
+                lcs_for = max((abs(x[1] - x[0]) if len(x) > 1 else 0) for x in x1) if len(x1) > 0 else 0
+                lcs_rev = max((abs(x[1] - x[0]) if len(x) > 1 else 0) for x in x2) if len(x2) > 0 else 0
+            elif substitution_count != 0:
                 # print "RE"
                 x1, y1, x2, y2, lcs_for, lcs_rev = find_match_pos_regex(
                     seq_one,
@@ -934,6 +951,7 @@ def pairdotplot(
 def polydotplot(
     input_fasta,
     wordsize=10,
+    alignments=None,
     gff_files=None,
     alphabetic_sorting=False,
     convert_wobbles=False,
@@ -1239,7 +1257,15 @@ def polydotplot(
                     log_txt += str(counter)
 
             # Get positions of matches &  length of longest common substring based on match lengths
-            if substitution_count != 0:
+            if alignments is not None:
+                # Use pre-calculated alignments
+                x1, y1, x2, y2 = alignments_to_coordinates(
+                    alignments, name_one, name_two, len_two
+                )
+                # Calculate LCS from alignment lengths (use longest alignment)
+                lcs_for = max((abs(x[1] - x[0]) if len(x) > 1 else 0) for x in x1) if len(x1) > 0 else 0
+                lcs_rev = max((abs(x[1] - x[0]) if len(x) > 1 else 0) for x in x2) if len(x2) > 0 else 0
+            elif substitution_count != 0:
                 # print "RE"
                 x1, y1, x2, y2, lcs_for, lcs_rev = find_match_pos_regex(
                     seq_one,

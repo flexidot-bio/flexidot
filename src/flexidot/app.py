@@ -7,6 +7,7 @@ import pylab as P
 
 from flexidot._version import __version__
 from flexidot.plotting import pairdotplot, polydotplot, selfdotplot
+from flexidot.utils.alignments import load_alignments
 from flexidot.utils.args import parse_args
 from flexidot.utils.checks import check_kmer_length, print_summary
 from flexidot.utils.file_handling import read_gff_color_config
@@ -101,6 +102,19 @@ def main():
     line_col_for = args.line_col_for
     line_width = args.line_width
 
+    # Load pre-calculated alignments if provided
+    alignments = None
+    if args.alignment_file:
+        logging.info(f'Loading pre-calculated alignments from: {args.alignment_file}')
+        alignments = load_alignments(
+            args.alignment_file,
+            file_format=args.alignment_format,
+            min_identity=args.min_identity,
+            min_length=args.min_length,
+            filter_redundant=True,
+        )
+        logging.info(f'Loaded {len(alignments)} alignments')
+
     # Set True if nucleotide sequence
     if args.type_seq == 'nuc':
         type_nuc = True
@@ -157,6 +171,7 @@ def main():
         list_of_png_names = selfdotplot(
             seq_list,
             wordsize,
+            alignments=alignments,
             alphabetic_sorting=alphabetic_sorting,
             convert_wobbles=convert_wobbles,
             filetype=args.filetype,
@@ -193,6 +208,7 @@ def main():
             list_of_png_names = pairdotplot(
                 seq_list,
                 wordsize,
+                alignments=alignments,
                 alphabetic_sorting=alphabetic_sorting,
                 convert_wobbles=convert_wobbles,
                 filetype=filetype,
@@ -226,6 +242,7 @@ def main():
             list_of_png_names = pairdotplot(
                 seq_list,
                 wordsize,
+                alignments=alignments,
                 alphabetic_sorting=alphabetic_sorting,
                 convert_wobbles=convert_wobbles,
                 filetype=filetype,
@@ -261,6 +278,7 @@ def main():
         list_of_png_names = polydotplot(
             seq_list,
             wordsize,
+            alignments=alignments,
             alphabetic_sorting=alphabetic_sorting,
             convert_wobbles=convert_wobbles,
             filetype=filetype,
