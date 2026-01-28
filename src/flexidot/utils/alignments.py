@@ -133,7 +133,13 @@ def parse_blast6(
                 }
             )
 
-    logging.info(f'Parsed {len(alignments)} alignments from BLAST6 file: {filepath}')
+    if len(alignments) == 0:
+        logging.warning(
+            f'No alignments found in BLAST6 file: {filepath}. '
+            'Plot will be generated without alignment overlays.'
+        )
+    else:
+        logging.info(f'Parsed {len(alignments)} alignments from BLAST6 file: {filepath}')
     return alignments
 
 
@@ -260,7 +266,13 @@ def parse_paf(
                 }
             )
 
-    logging.info(f'Parsed {len(alignments)} alignments from PAF file: {filepath}')
+    if len(alignments) == 0:
+        logging.warning(
+            f'No alignments found in PAF file: {filepath}. '
+            'Plot will be generated without alignment overlays.'
+        )
+    else:
+        logging.info(f'Parsed {len(alignments)} alignments from PAF file: {filepath}')
     return alignments
 
 
