@@ -139,7 +139,9 @@ def parse_blast6(
             'Plot will be generated without alignment overlays.'
         )
     else:
-        logging.info(f'Parsed {len(alignments)} alignments from BLAST6 file: {filepath}')
+        logging.info(
+            f'Parsed {len(alignments)} alignments from BLAST6 file: {filepath}'
+        )
     return alignments
 
 

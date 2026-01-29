@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-
 from flexidot.utils.alignments import load_alignments
 from flexidot.utils.file_handling import read_gffs
 
