@@ -175,7 +175,11 @@ flexidot -i sSaTar.fas -m 2 -a alignments.blast6 -o blast_dotplot \
 
 Output:
 
+<p align="center">
+
 <img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/blast_dotplot-Polydotplot.png?raw=true" width="400">
+
+</p>
 
 When aligning sequences with `nucmer` the alignment `.delta` file can be
 converted to `PAF` using `paftools.js` which comes bundled with `Minimap2`.
@@ -197,7 +201,11 @@ flexidot -i sSaTar.fas -m 2 -a self_align.paf -o nucmer_dotplot \
 
 Output:
 
+<p align="center">
+
 <img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/nucmer_dotplot-Polydotplot.png?raw=true" width="400">
+
+</p>
 
 ## Plotting modes
 
