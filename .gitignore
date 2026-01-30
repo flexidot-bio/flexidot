@@ -1,6 +1,9 @@
 # Mac stuff
 .DS_Store
 
+# Dev
+.ideas/
+
 # Versioning
 src/flexidot/_version.py
 
