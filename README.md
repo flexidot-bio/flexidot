@@ -5,27 +5,36 @@
 
 # FlexiDot: Highly customizable, ambiguity-aware dotplots for visual sequence analyses
 
-![alt text](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplots_banner4.png "FlexiDot self dotplots")
+![FlexiDot self dotplots](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplots_banner4.png?raw=true "FlexiDot self dotplots")
 
-FlexiDot is a cross-platform dotplot suite generating high quality self, pairwise and all-against-all visualizations of transposons and other discrete sequences.
+FlexiDot is a cross-platform dotplot suite generating high quality self,
+pairwise and all-against-all visualizations of transposons and other discrete
+sequences.
 
-To improve dotplot suitability for comparison of consensus and error-prone sequences, FlexiDot supports strict (k-mer based) and relaxed handling of mismatches and ambiguous residues, as well as plotting of pre-computed alignments (i.e. from BLAST or Nucmer).
+To improve dotplot suitability for comparison of consensus and error-prone
+sequences, FlexiDot supports strict (k-mer based) and relaxed handling of
+mismatches and ambiguous residues, as well as plotting of pre-computed
+alignments (i.e. from BLAST or Nucmer).
 
-The custom shading modules facilitate dotplot interpretation and feature identification by adding information on feature annotations and sequence similarities to the images.
+The custom shading modules facilitate dotplot interpretation and feature
+identification by adding information on feature annotations and sequence
+similarities to the images.
 
-Combined with collage-like outputs, FlexiDot supports simultaneous visual screening of large sequence sets, allowing dotplot use in routine screening workflows.
+Combined with collage-like outputs, FlexiDot supports simultaneous visual
+screening of large sequence sets, allowing dotplot use in routine screening
+workflows.
 
 ## Citation
 
 If you use FlexiDot in your research, please cite us:
 
-**Kathrin M. Seibt, Thomas Schmidt, and Tony Heitkam** (2018) "FlexiDot: Highly customizable, ambiguity-aware dotplots for visual sequence analyses". *Bioinformatics* 34 (20), 3575–3577, doi: 10.1093/bioinformatics/bty395  -  [**Read article**](https://doi.org/10.1093/bioinformatics/bty395)
+**Kathrin M. Seibt, Thomas Schmidt, and Tony Heitkam** (2018) "FlexiDot: Highly customizable, ambiguity-aware dotplots for visual sequence analyses". *Bioinformatics* 34 (20), 3575–3577, doi: 10.1093/bioinformatics/bty395 - [**Read article**](https://doi.org/10.1093/bioinformatics/bty395)
 
 ## FlexiDot versions and updates
 
-<img align="right" width="100" height="100" src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/FlexiLogo.png">
+<img align="right" width="100" height="100" src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/FlexiLogo.png?raw=true">
 
-**Current version (Jan 2026): FlexiDot v2.1.0**
+**Current version (Jan 2026): FlexiDot v2.1.1**
 
 For an overview of FlexiDot version updates please see the [code history](https://github.com/flexidot-bio/flexidot/blob/master/CHANGELOG.md).
 
@@ -35,6 +44,7 @@ For an overview of FlexiDot version updates please see the [code history](https:
 * [Parameter cheat sheet v1.0.6](https://github.com/flexidot-bio/flexidot/blob/master/docs/usage_v1.06.pdf)
 * [Artificial test sequences used for the examples](https://github.com/flexidot-bio/flexidot/tree/master/tests/test-data)
 * [Example: Adding annotation-based shading to a dotplot](https://github.com/flexidot-bio/flexidot/blob/master/docs/tutorial_add_annotation.md)
+* [Example: Plotting alignments from BLASTn or Nucmer](https://github.com/flexidot-bio/flexidot/blob/master/docs/tutorial_pre_calculated_alignments.md)
 * [Presentation slides introducing dotplots and our FlexiDot tool](https://zenodo.org/record/2558556)
 
 ## Implementation
@@ -49,7 +59,8 @@ FlexiDot is implemented in [Python 3](https://www.python.org/), with dependencie
 * [easydev](https://pypi.python.org/pypi/easydev) (required for colormap)
 * [colour](https://pypi.python.org/pypi/colour)
 
-You can create a Conda environment with these dependencies using the YAML file in this repo.
+You can create a Conda environment with these dependencies using the YAML file
+in this repo.
 
 ```bash
 conda env create -f environment.yml
@@ -57,9 +68,10 @@ conda env create -f environment.yml
 conda activate flexidot
 ```
 
-After activating the flexidot environment you can use pip to install the latest version of Flexidot.
+After activating the flexidot environment you can use `pip` to install the
+latest version of FlexiDot.
 
-## Installing Flexidot
+## Installing FlexiDot
 
 Installation options:
 
@@ -93,7 +105,8 @@ flexidot --help
 
 ### Setup Development Environment
 
-If you want to contribute to the project or run the latest development version, you can clone the repository and install the package in editable mode.
+If you want to contribute to the project or run the latest development version,
+you can clone the repository and install the package in editable mode.
 
 ```bash
 # Clone repository
@@ -116,9 +129,11 @@ pre-commit install
 
 ### Processing fasta files
 
-Flexidot accepts one or more uncompressed fasta files as input. The files can contain multiple sequences.
+FlexiDot accepts one or more uncompressed fasta files as input. The files can
+contain multiple sequences.
 
-By default, Flexidot will use shared k-mers between sequence pairs to generate the dot-plot.
+By default, FlexiDot will use shared k-mers between sequence pairs to generate
+the dot-plot.
 
 ```bash
 # Use individual fasta file (can contain multiple sequences)
@@ -133,53 +148,78 @@ flexidot -i *.fasta [optional arguments]
 
 Optional arguments are explained below and in detail with the `--help` option.
 
-Importantly, `-k` defines the word size (e.g. `-k 10`) and `-t` specifies the sequence type (`-t nuc` for DNA [default]; `-t aa` for proteins). The plotting mode is chosen via `-m` and described below.
+Importantly, `-k` defines the word size (e.g. `-k 10`) and `-t` specifies the
+sequence type (`-t nuc` for DNA [default]; `-t aa` for proteins). The plotting
+mode is chosen via `-m` and described below.
 
 ### Processing pre-computed alignments
 
-Flexidot can also process pre-calculated alignments from tools such as `blastn`, `nucmer`, or `minimap2`.
-This approach is often faster than k-mer indexing and is tolerant of gaps and mismatches.
+FlexiDot can also process pre-calculated alignments from tools such as `blastn`
+or `nucmer`.
+This approach is often faster than k-mer indexing and is tolerant of gaps and
+mismatches.
 
 [See pre-calculated alignment tutorial](docs/tutorial_pre_calculated_alignments.md) for detailed examples.
 
+FlexiDot can process BLAST fmt 6 output or PAF alignment files.
+
 ```bash
 # Run BLASTN with output format 6
-blastn -query sequence.fasta -subject sequence.fasta -outfmt 6 -out alignments.blast6 \
+blastn -query sSaTar.fas -subject sSaTar.fas -outfmt 6 -out alignments.blast6 \
 -word_size 4 -evalue 1e-3 -perc_identity 60.0 -max_target_seqs 10000
 
 # Plot alignments
-flexidot -i sequence.fasta -m 2 -a alignments.blast6 -o blast_dotplot
+flexidot -i sSaTar.fas -m 2 -a alignments.blast6 -o blast_dotplot \
+--gff sSaTar.gff3 --gff_color_config sSaTar.config
+```
 
+Output:
+
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/blast_dotplot-Polydotplot.png?raw=true" width="400">
+
+When aligning sequences with `nucmer` the alignment `.delta` file can be
+converted to `PAF` using `paftools.js` which comes bundled with `Minimap2`.
+
+```bash
 ### Using Nucmer
 
 # Self-alignment with nucmer (use --nosimplify for repeats in self alignments)
-nucmer --maxmatch --nosimplify --minmatch 15 --mincluster 20 --diagfactor 0.3 \
---prefix self_align sequence.fasta sequence.fasta
+nucmer --maxmatch --nosimplify --minmatch 10 --mincluster 30 --diagfactor 0.12 \
+--prefix self_align sSaTar.fas sSaTar.fas
 
 # Convert directly using paftools (if installed with minimap2)
 paftools.js delta2paf self_align.delta > self_align.paf
 
 # Plot alignments
-flexidot -i sequence.fasta -a self_align.paf -o nucmer_dotplot
+flexidot -i sSaTar.fas -m 2 -a self_align.paf -o nucmer_dotplot \
+--gff sSaTar.gff3 --gff_color_config sSaTar.config
 ```
+
+Output:
+
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/nucmer_dotplot-Polydotplot.png?raw=true" width="400">
 
 ## Plotting modes
 
-FlexiDot allows sequence investigation in three run modes via the option `-m/--mode`:
+FlexiDot allows sequence investigation in three run modes via the option
+`-m/--mode`:
 
 `-m 0`    self sequence comparison
 `-m 1`    pairwise sequence comparison
 `-m 2`    all-to-all sequence comparison
 
-To run multiple plotting modes, call the option multiple times i.e. `-m 0 -m 1 -m 2`.
+To run multiple plotting modes, call the option multiple times
+i.e. `-m 0 -m 1 -m 2`.
 
 ### Self dotplots
 
 with `-m/--mode 0`
 
-In **self** dotplot mode, each sequence is compared with itself. The resulting dotplots can be combined to form a **collage** (with `--collage`) or written to separate files.
+In **self** dotplot mode, each sequence is compared with itself. The resulting
+dotplots can be combined to form a **collage** (with `--collage`) or written to
+separate files.
 
-![alt text](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplots_banner.png "FlexiDot self dotplots")
+![FlexiDot self dotplots](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplots_banner.png?raw=true "FlexiDot self dotplots")
 
 ```bash
 # A single sequence compared to itself
@@ -196,11 +236,19 @@ flexidot -i test-seqs.fasta -m 0 -k 10 --n_col 6 -P 15 -g example.gff3 -G gff_co
 
 with `-m/--mode 1`
 
-For **pairwise** dotplots, the collage output is recommended for larger numbers of sequences. The collage output of the 15 pairwise dotplots for the test sequences is shown below. By default, dotplot images are in square format (panel A). This maximizes the visibility of matches, if the compared sequences differ drastically in length. To enable scaling according to the respective sequence lengths, the FlexiDot scaling feature is callable via option `-L/--length_scaling` (panel B). If scaling is enabled, a red line indicates the end of the shorter sequence in the collage output.
+For **pairwise** dotplots, the collage output is recommended for larger numbers
+of sequences. The collage output of the 15 pairwise dotplots for the test
+sequences is shown below. By default, dotplot images are in square format
+(panel A). This maximizes the visibility of matches, if the compared sequences
+differ drastically in length. To enable scaling according to the respective
+sequence lengths, the FlexiDot scaling feature is callable via option
+`-L/--length_scaling` (panel B). If scaling is enabled, a red line indicates the
+end of the shorter sequence in the collage output.
 
-Pairwise comparisons can be limited to only pairs that contain the first sequence in a fasta file using `--only_vs_first_seq`.
+Pairwise comparisons can be limited to only pairs that contain the first
+sequence in a fasta file using `--only_vs_first_seq`.
 
-<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/pairwise_low_res.png" width="600">
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/pairwise_low_res.png?raw=true" width="600">
 
 ```bash
 # Panel A
@@ -213,9 +261,13 @@ flexidot -i test-seqs.fasta -m 1 -k 10 --n_col 3 -c -L
 
 with `-m/--mode 2`
 
-In **all-against-all** mode, FlexiDot compares each pair from a set of input sequences. To enable the identification of long shared subsequences at a glance, FlexiDot offers similarity shading (switched on/off via option `-x/--lcs_shading`) based on the LCS length in all-against-all comparisons (see below).
+In **all-against-all** mode, FlexiDot compares each pair from a set of input
+sequences. To enable the identification of long shared subsequences at a glance,
+FlexiDot offers similarity shading (switched on/off via option
+`-x/--lcs_shading`) based on the LCS length in all-against-all comparisons (see
+below).
 
-<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/all_against_all.png" width="500">
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/all_against_all.png?raw=true" width="500">
 
 ```bash
 # All-by-all plot, LCS shading using maximal LCS length
@@ -228,15 +280,25 @@ flexidot -i test-seqs.fasta -m 2 -k 10 -y 0 -x
 
 ### Mismatch and ambiguity handling
 
-In diverged or distantly related sequences matches may be interrupted by mismatches, or residues might be represented as ambiguities to refer to frequent variants or mutations. Similarly, relaxed matching is helpful when analyzing error-prone sequences like SMRT reads. Relaxation of the matching conditions thus increases sensitivity, while decreasing specificity.
+In diverged or distantly related sequences matches may be interrupted by
+mismatches, or residues might be represented as ambiguities to refer to frequent
+variants or mutations. Similarly, relaxed matching is helpful when analyzing
+error-prone sequences like SMRT reads. Relaxation of the matching conditions
+thus increases sensitivity, while decreasing specificity.
 
-Firstly, FlexiDot handles **ambiguous residues**, often found in consensus sequences. This allows the comparison of species-specific representations of multigene or repeat families as well as common variants or sequence subfamilies. The ambiguity handling is controlled via`-w/--wobble_conversion`.
+Firstly, FlexiDot handles **ambiguous residues**, often found in consensus
+sequences. This allows the comparison of species-specific representations of
+multigene or repeat families as well as common variants or sequence subfamilies.
+The ambiguity handling is controlled via`-w/--wobble_conversion`.
 
-Secondly, a defined number of **mismatches** within the window can be allowed with `-S/--substitution_count [number of allowed mismatches (substitutions)]`. This is even less stringent than the ambiguity handling. Please note, that only substitution mutations are allowed but not indels.
+Secondly, a defined number of **mismatches** within the window can be allowed
+with `-S/--substitution_count [number of allowed mismatches (substitutions)]`.
+This is even less stringent than the ambiguity handling. Please note, that only
+substitution mutations are allowed but not indels.
 
 Lastly, both mismatch and ambiguity handling can be combined for the analysis.
 
-<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Fig-Suppl-MismatchesWobbles.png" width="600">
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Fig-Suppl-MismatchesWobbles.png?raw=true" width="600">
 
 ```bash
 # Mismatch tolerance -S
@@ -258,13 +320,21 @@ flexidot -i Seq1.fasta Seq4.fasta -m 1 -k 10 -w -S 2
 
 ### Annotation-based shading
 
-Note: See also [**our tutorial**](https://github.com/flexidot-bio/flexidot/blob/master/docs/tutorial_add_annotation.md) on how to integrate annotation shadings with a real-life example.
+Note: See also [**our tutorial**](https://github.com/flexidot-bio/flexidot/blob/master/docs/tutorial_add_annotation.md)
+on how to integrate annotation shadings with a real-life example.
 
-In FlexiDot self dotplots, annotated sequence regions can be highlighted by **shading** to allow clear assignment of dotplot regions to specific sequence contexts (see Seq2 in self dotplots). The underlying **annotation** information must be provided in general feature format (**gff3**), either as individual file or file list via the `-g/--input_gff_files` option. To customize GFF-based shading, a user-defined configuration file can be provided via the `-G/--gff_color_config option`. Example files are provided in the test-data directory. Please note, that a legend is generated in a separate file.
+In FlexiDot self dotplots, annotated sequence regions can be highlighted by
+**shading** to allow clear assignment of dotplot regions to specific sequence
+contexts (see Seq2 in self dotplots). The underlying **annotation** information
+must be provided in general feature format (**gff3**), either as individual file
+or file list via the `-g/--input_gff_files` option. To customize GFF-based
+shading, a user-defined configuration file can be provided via the
+`-G/--gff_color_config option`. Example files are provided in the test-data
+directory. Please note, that a legend is generated in a separate file.
 
-If you wish to find out more on the gff3 file format used here, Ensembl provides a [good overview](https://www.ensembl.org/info/website/upload/gff3.html).
+If you wish to find out more on the gff3 file format used here, [The Sequence Ontology overview](https://github.com/the-sequence-ontology/specifications/blob/master/gff3.md).
 
-<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplot_shaded.png" width="500">
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Selfdotplot_shaded.png?raw=true" width="500">
 
 ```bash
 flexidot -i Seq2.fasta -m 0 -k 10 -w -P 5 -g example.gff3 -G gff_color.config
@@ -272,9 +342,12 @@ flexidot -i Seq2.fasta -m 0 -k 10 -w -P 5 -g example.gff3 -G gff_color.config
 
 ### [since FlexiDot_v1.03] Annotation-based shading also available for all-against-all dotplots
 
-Previously only available for self dotplots, we added annotation-based shading to all-against-all dotplots, allowing for many new visualizations. As before, annotation information is provided as general feature file (GFF3). These features are added to the middle diagonal (see our example below).
+Previously only available for self dotplots, we added annotation-based shading
+to all-against-all dotplots, allowing for many new visualizations. As before,
+annotation information is provided as general feature file (GFF3). These
+features are added to the middle diagonal (see our example below).
 
-<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/all_against_all_annotation_based_shading_cool.png" width="700">
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/all_against_all_annotation_based_shading_cool.png?raw=true" width="700">
 
 Basic command:
 
@@ -282,10 +355,12 @@ Basic command:
 flexidot -i test-seqs.fasta -g example2.gff3 -G gff_color.config -m 2
 ```
 
-Command plus aesthetics as shown here (+ LCS shading, wordsize 10, change of subplot spacing and line width):
+Command plus aesthetics as shown here (+ LCS shading, wordsize 10, change of
+subplot spacing and line width):
 
 ```bash
-flexidot -i test-seqs.fasta -g example2.gff3 -G gff_color.config -m 2 -x -k 10 -F 0.06 -A 1.5
+flexidot -i test-seqs.fasta -g example2.gff3 -G gff_color.config \
+-m 2 -x -k 10 -F 0.06 -A 1.5
 ```
 
 The test files used here are [provided](https://github.com/flexidot-bio/flexidot/tree/master/test-data):
@@ -296,17 +371,28 @@ The test files used here are [provided](https://github.com/flexidot-bio/flexidot
 
 ### Similarity shading
 
-In all-against-all mode, FlexiDot compares each pair from a set of input sequences. To enable the identification of long shared subsequences at a glance, FlexiDot offers similarity shading (switched on/off via option `-x/--lcs_shading`) based on the **LCS length** (longest common subsequence, or longest match if mismatches are considered) in all-against-all comparisons. Longer matches are represented by darker background shading. A separate shading **legend** output file is created written according to mathematical interval notation, where interval boundaries are represented by a pair of numbers. Consequently, the symbols “(” or “)” represent exclusion, whereas “[” or “]” represent inclusion of the respective number.
+In all-against-all mode, FlexiDot compares each pair from a set of input
+sequences. To enable the identification of long shared subsequences at a glance,
+FlexiDot offers similarity shading (switched on/off via option
+`-x/--lcs_shading`) based on the **LCS length** (longest common subsequence, or
+longest match if mismatches are considered) in all-against-all comparisons.
+Longer matches are represented by darker background shading. A separate shading
+**legend** output file is created written according to mathematical interval
+notation, where interval boundaries are represented by a pair of numbers.
+Consequently, the symbols “(” or “)” represent exclusion, whereas “[” or “]”
+represent inclusion of the respective number.
 
-FlexiDot similarity shading is highly customizable with the following parameters, explained in depth in the documentation:
+FlexiDot similarity shading is highly customizable with the following
+parameters, explained in depth in the documentation:
 
 * Reference for shading (option `-y/--lcs_shading_ref`)
 * Number of shading intervals (option `-X/--lcs_shading_num`)
 * Shading based on sequence orientation (option `-z/--lcs_shading_ori`)
 
-Shading examples based on sequence orientation (forward, panel A; reverse, panel B; both, panel C) are shown:
+Shading examples based on sequence orientation (forward, panel A; reverse,
+panel B; both, panel C) are shown:
 
-![alt text](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/all_against_all_shaded_orientation2.png "FlexiDot shaded dotplots")
+![FlexiDot shaded dotplots](https://github.com/flexidot-bio/flexidot/blob/master/docs/images/all_against_all_shaded_orientation2.png?raw=true "FlexiDot shaded dotplots")
 
 ```bash
 #Panel A - lcs_shading_ori: 0 = forward
@@ -319,11 +405,19 @@ flexidot -i test-seqs.fasta -m 2 -k 10 -x -y 0 -z 2
 
 ### Custom matrix shading
 
-When comparing related sequences, multiple sequence alignments are frequently applied. The resulting pairwise **sequence similarities** can be integrated in the FlexiDot images by providing a **matrix file** via `-u/--user_matrix_file <matrix.txt>`. This allows a shading of the upper right triangle according to the matrix (here orange). With `-U/--user_matrix_print` the matrix values can be printed into the respective fields. Besides, also **text** information can be provided in the matrix, but then shading is suppressed.
+When comparing related sequences, multiple sequence alignments are frequently
+applied. The resulting pairwise **sequence similarities** can be integrated in
+the FlexiDot images by providing a **matrix file** via
+`-u/--user_matrix_file <matrix.txt>`. This allows a shading of the upper right
+triangle according to the matrix (here orange). With `-U/--user_matrix_print`
+the matrix values can be printed into the respective fields. Besides, also
+**text** information can be provided in the matrix, but then shading is
+suppressed.
 
-In the example, LCS and matrix shading are combined to visualize the relationships between different members of a repeat family.
+In the example, LCS and matrix shading are combined to visualize the
+relationships between different members of a repeat family.
 
-<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Beetle_matrix_shading.png" width="750">
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/Beetle_matrix_shading.png?raw=true" width="750">
 
 ```bash
 # Beetle TE plot

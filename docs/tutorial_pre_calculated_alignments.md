@@ -1,6 +1,9 @@
 # Plotting Pre-calculated Alignments
 
-FlexiDot now supports plotting pre-calculated alignments from external alignment tools like blastn, Nucmer, and Minimap2. This feature allows you to visualize alignments that have been generated using more sensitive or specialized alignment algorithms, rather than relying solely on k-mer matching.
+FlexiDot now supports plotting pre-calculated alignments from external alignment
+tools like blastn, Nucmer, and Minimap2. This feature allows you to visualize
+alignments that have been generated using more sensitive or specialized
+alignment algorithms, rather than relying solely on k-mer matching.
 
 ## Supported Alignment Formats
 
@@ -8,7 +11,8 @@ FlexiDot supports two popular alignment output formats:
 
 ### BLAST6 Format (Tabular)
 
-BLAST6 is the tabular output format from BLAST (output format 6). It contains 12 tab-separated columns:
+BLAST6 is the tabular output format from BLAST (output format 6). It contains 12
+tab-separated columns:
 
 | Column | Description |
 |--------|-------------|
@@ -75,6 +79,7 @@ flexidot -i sequences.fasta -a alignments.paf -m 2
 ### Specifying Alignment Format
 
 FlexiDot auto-detects the alignment format from the file extension:
+
 - `.blast6`, `.b6`, `.blastn`, `.blast`, `.m8` → BLAST6 format
 - `.paf` → PAF format
 
@@ -147,7 +152,6 @@ COLOURS="tests/test-data/sSaTar_example/sSaTar.config"
 COLORS=$COLOURS
 ```
 
-
 ### 2. Standard K-mer Matching
 
 ```bash
@@ -157,6 +161,8 @@ flexidot -i $SEQ -m 2 -k 15 -o kmer_dotplot --gff $ANNOTATION --gff_color_config
 
 ### 3. Using BLAST Alignments
 
+FlexiDot can process BLAST fmt 6 output alignment files.
+
 ```bash
 # Generate BLAST alignments
 blastn -query $SEQ -subject $SEQ -outfmt 6 -word_size 4 -perc_identity 60.0 -max_target_seqs 10000 -evalue 0.001 -out alignments.blast6
@@ -165,11 +171,20 @@ blastn -query $SEQ -subject $SEQ -outfmt 6 -word_size 4 -perc_identity 60.0 -max
 flexidot -i $SEQ -m 2 -a alignments.blast6 -m 2 -o blast_dotplot --gff $ANNOTATION --gff_color_config $COLOURS --min_identity 80 --min_length 20
 ```
 
+Output:
+
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/blast_dotplot-Polydotplot.png?raw=true" width="400">
+
 ### 3. Using PAF alignments from Nucmer
+
+All other alignment types can be converted to PAF format first.
+
+When aligning sequences with `nucmer` the alignment `.delta` file can be
+converted to `PAF` using `paftools.js` which comes bundled with `Minimap2`.
 
 ```bash
 # Self-alignment with nucmer (use --nosimplify for repeats in self alignments)
-nucmer --maxmatch --nosimplify --minmatch 15 --mincluster 20 --diagfactor 0.3 \
+nucmer --maxmatch --nosimplify --minmatch 10 --mincluster 30 --diagfactor 0.12 \
 --prefix self_align $SEQ $SEQ
 
 # Convert directly using paftools (if installed with minimap2)
@@ -179,12 +194,19 @@ paftools.js delta2paf self_align.delta > self_align.paf
 flexidot -i $SEQ -a self_align.paf -m 2 -o nucmer_dotplot --gff $ANNOTATION --gff_color_config $COLOURS
 ```
 
+Output:
+
+<img src="https://github.com/flexidot-bio/flexidot/blob/master/docs/images/nucmer_dotplot-Polydotplot.png?raw=true" width="400">
+
 ### 4. Using Minimap2 Alignments
+
+Minimap2 is not particularly well suited to detecting small secondary
+alignments in small sequences. It is better suited to comparing genomic contigs.
+
+Hint: Try tinkering with settings: -k 10 -N 1000 -p 0.05 -r 2k
 
 ```bash
 # Generate minimap2 alignments
-# Note: Minimap2 is not particularly well suited to detecting small secondary alignments in small sequences.
-# Try tinkering with settings: -k 10 -N 1000 -p 0.05 -r 2k, or use Nucmer.
 minimap2 -x asm20 $SEQ $SEQ > alignments.paf
 
 # Plot alignments
@@ -193,17 +215,24 @@ flexidot -i $SEQ -a alignments.paf -m 2 -o minimap_dotplot --gff $ANNOTATION --g
 
 ## Tips and Best Practices
 
-1. **Redundant Alignment Filtering**: FlexiDot automatically filters redundant alignments where the same sequence pair appears in both directions (e.g., SeqA vs SeqB and SeqB vs SeqA). Only one copy is kept.
+1. **Redundant Alignment Filtering**: FlexiDot automatically filters redundant
+alignments where the same sequence pair appears in both directions (e.g., SeqA
+vs SeqB and SeqB vs SeqA). Only one copy is kept.
 
-2. **Sequence Names**: Ensure the sequence names in your FASTA file match exactly the names in your alignment file. FlexiDot uses these names to associate alignments with the correct sequences.
+2. **Sequence Names**: Ensure the sequence names in your FASTA file match
+exactly the names in your alignment file. FlexiDot uses these names to associate
+alignments with the correct sequences.
 
-3. **Self-Alignments**: Self-alignments (sequence aligned to itself) are preserved and can be useful for identifying repeats within sequences.
+3. **Self-Alignments**: Self-alignments (sequence aligned to itself) are
+preserved and can be useful for identifying repeats within sequences.
 
 4. **Strand Information**:
    - In BLAST6 format, strand is determined by the subject coordinates (start > end indicates reverse strand).
    - In PAF format, strand is explicitly provided in column 5 (+/-).
 
-5. **Performance**: Using pre-calculated alignments can be significantly faster than k-mer matching for large datasets, especially when alignments have already been computed for other purposes.
+5. **Performance**: Using pre-calculated alignments can be significantly faster
+than k-mer matching for large datasets, especially when alignments have already
+been computed for other purposes.
 
 ## Comparison: K-mer Matching vs Pre-calculated Alignments
 
@@ -229,4 +258,5 @@ flexidot -i $SEQ -a alignments.paf -m 2 -o minimap_dotplot --gff $ANNOTATION --g
    - Explicitly specify the format with `--alignment_format`
 
 3. **Some sequences missing from plot**:
-   - Ensure all sequences in your FASTA file have at least one alignment in the alignment file
+   - Ensure all sequences in your FASTA file have at least one alignment in the
+   alignment file
