@@ -73,6 +73,5 @@ ENV/
 .mypy_cache/
 
 # Test output files
-*.png
 *.pdf
 *.svg
