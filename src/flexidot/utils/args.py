@@ -82,7 +82,8 @@ def parse_args():
         '--mode',
         action='append',
         choices=['0', '1', '2'],
-        help='Mode of FlexiDot dotplotting. 0 = self [default], 1 = paired, 2 = poly (matrix with all-against-all dotplots). Call -m multiple times to run multiple modes.',
+        required=True,
+        help='Mode of FlexiDot dotplotting. 0 = self, 1 = paired, 2 = poly (matrix with all-against-all dotplots). Call -m multiple times to run multiple modes.',
     )
     parser.add_argument(
         '-t',
