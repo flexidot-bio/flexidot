@@ -17,6 +17,8 @@ jobs:
         with:
           auto-update-conda: true # Optional: update Conda to the latest version
           python-version: ${{ matrix.python-version }}
+          conda-remove-defaults: true
+          channels: conda-forge, bioconda
       # Install any additional dependencies not included in the pyproject.toml file
       - name: Install additional dependencies
         run: |
