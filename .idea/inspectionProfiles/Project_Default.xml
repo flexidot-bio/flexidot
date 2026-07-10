@@ -1,0 +1,58 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="28">
+            <item index="0" class="java.lang.String" itemvalue="rmblast" />
+            <item index="1" class="java.lang.String" itemvalue="scikit-learn" />
+            <item index="2" class="java.lang.String" itemvalue="numpy" />
+            <item index="3" class="java.lang.String" itemvalue="mafft" />
+            <item index="4" class="java.lang.String" itemvalue="emboss" />
+            <item index="5" class="java.lang.String" itemvalue="repeatmodeler" />
+            <item index="6" class="java.lang.String" itemvalue="muscle" />
+            <item index="7" class="java.lang.String" itemvalue="multiprocess" />
+            <item index="8" class="java.lang.String" itemvalue="hmmer" />
+            <item index="9" class="java.lang.String" itemvalue="perl" />
+            <item index="10" class="java.lang.String" itemvalue="urllib3" />
+            <item index="11" class="java.lang.String" itemvalue="repeatmasker" />
+            <item index="12" class="java.lang.String" itemvalue="iqtree" />
+            <item index="13" class="java.lang.String" itemvalue="cd-hit" />
+            <item index="14" class="java.lang.String" itemvalue="python" />
+            <item index="15" class="java.lang.String" itemvalue="dataclasses" />
+            <item index="16" class="java.lang.String" itemvalue="samtools" />
+            <item index="17" class="java.lang.String" itemvalue="click" />
+            <item index="18" class="java.lang.String" itemvalue="blast" />
+            <item index="19" class="java.lang.String" itemvalue="pfam_scan" />
+            <item index="20" class="java.lang.String" itemvalue="pandas" />
+            <item index="21" class="java.lang.String" itemvalue="regex" />
+            <item index="22" class="java.lang.String" itemvalue="matplotlib" />
+            <item index="23" class="java.lang.String" itemvalue="tk" />
+            <item index="24" class="java.lang.String" itemvalue="bedtools" />
+            <item index="25" class="java.lang.String" itemvalue="r-base" />
+            <item index="26" class="java.lang.String" itemvalue="ghostscript" />
+            <item index="27" class="java.lang.String" itemvalue="py2app" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N806" />
+          <option value="N802" />
+          <option value="N803" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="int.cons_evaluation" />
+          <option value="tetrimmer.TEtrimmer_proof_anno_GUI.annoGUI_new.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

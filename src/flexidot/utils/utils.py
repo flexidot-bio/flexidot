@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 
 from colormap import rgb2hex
@@ -65,6 +66,14 @@ def shorten_name(seq_name, max_len=20, title_clip_pos='B'):  # , delim="_"):
     """
 
     return name
+
+
+def sanitize_filename(name):
+    """
+    replace characters that are unsafe in filenames (e.g. path separators
+    found in sequence names such as "TE#Class/Family") with underscores
+    """
+    return re.sub(r'[\\/]', '_', name)
 
 
 def unicode_name(name):

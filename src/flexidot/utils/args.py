@@ -55,9 +55,11 @@ def parse_args():
     parser.add_argument(
         '-f',
         '--filetype',
-        choices=['png', 'pdf', 'svg'],
+        choices=['png', 'pdf', 'svg', 'html'],
         default='png',
-        help='Output file format: png, pdf, svg',
+        help='Output file format: png, pdf, svg, html. '
+        'html produces an interactive Plotly dotplot (zoom/pan/hover); '
+        'collage layout, GFF shading, and LCS/custom-matrix shading are not supported in html output.',
     )
 
     # Sorting
@@ -224,7 +226,7 @@ def parse_args():
         '--gff',
         nargs='+',
         default=None,
-        help='GFF3 files for markup in self-dotplots. Provide a space-delimited list of GFF files.',
+        help='GFF3 files for markup in self-, paired, and poly dotplots. Provide a space-delimited list of GFF files.',
     )
     parser.add_argument(
         '-G',

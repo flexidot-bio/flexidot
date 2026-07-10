@@ -32,6 +32,7 @@ dependencies = [
     "easydev",
     "matplotlib",
     "numpy",
+    "plotly",
     "regex",
     "rich",
 ]
@@ -138,6 +139,7 @@ known-third-party = [
     "easydev",
     "matplotlib",
     "numpy",
+    "plotly",
     "regex",
 ]
 known-first-party = ["flexidot"]
@@ -153,6 +155,7 @@ known_third_party = [
     "easydev",
     "matplotlib",
     "numpy",
+    "plotly",
     "regex",
 ]
 known_first_party = ["flexidot"]

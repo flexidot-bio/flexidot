@@ -13,9 +13,15 @@ import pylab as P
 from flexidot.utils.alignments import alignments_to_coordinates
 from flexidot.utils.file_handling import legend_figure, read_gffs, read_matrix, read_seq
 from flexidot.utils.matching import find_match_pos_diag, find_match_pos_regex
+from flexidot.utils.plotly_export import (
+    save_pairdotplot_html,
+    save_polydotplot_html,
+    save_selfdotplot_html,
+)
 from flexidot.utils.utils import (
     calc_fig_ratio,
     create_color_list,
+    sanitize_filename,
     shorten_name,
     unicode_name,
 )
@@ -171,9 +177,11 @@ def selfdotplot(
         nrows = 1
     figsize_x, figsize_y = calc_fig_ratio(ncols, nrows, plot_size)
 
-    P.cla()  # clear any prior graph
+    if filetype != 'html':
+        P.cla()  # clear any prior graph
+        if multi:
+            P.figure(figsize=(figsize_x, figsize_y))
     if multi:
-        P.figure(figsize=(figsize_x, figsize_y))
         page_counter = 1
     list_of_png_names = []
 
@@ -218,6 +226,53 @@ def selfdotplot(
                 max_N_percentage=max_N_percentage,
                 type_nuc=type_nuc,
             )
+
+        # interactive HTML plotting with plotly (no collage)
+        if filetype == 'html':
+            if multi and counter == 1:
+                logging.info(
+                    'Collage layout is not supported for HTML output - generating one interactive file per sequence.'
+                )
+            html_suffix = ''
+            if convert_wobbles:
+                html_suffix += '_wobbles'
+            if substitution_count != 0:
+                html_suffix += '_S%d' % substitution_count
+            fig_name = '%s%s-%d_%s%s%s.%s' % (
+                prefix,
+                name_graph,
+                counter,
+                sanitize_filename(
+                    shorten_name(
+                        name_seq, max_len=title_length, title_clip_pos=title_clip_pos
+                    )
+                ),
+                wordsize_suffix,
+                html_suffix,
+                filetype,
+            )
+            save_selfdotplot_html(
+                name_seq=name_seq,
+                length_seq=length_seq,
+                x_lists=x_lists,
+                y_lists=y_lists,
+                x_lists_rc=x_lists_rc,
+                y_lists_rc=y_lists_rc,
+                fig_name=fig_name,
+                aa_bp_unit=aa_bp_unit,
+                line_col_for=line_col_for,
+                line_col_rev=line_col_rev,
+                line_width=line_width,
+                mirror_y_axis=mirror_y_axis,
+                title_length=title_length,
+                title_clip_pos=title_clip_pos,
+                label_size=label_size,
+                seq=seq_one,
+                gff_features=feat_dict.get(seq_name) if gff_files else None,
+                gff_color_dict=gff_color_dict,
+            )
+            list_of_png_names.append(fig_name)
+            continue
 
         # plotting with matplotlib
         #################################
@@ -418,8 +473,10 @@ def selfdotplot(
                 prefix,
                 name_graph,
                 counter,
-                shorten_name(
-                    name_seq, max_len=title_length, title_clip_pos=title_clip_pos
+                sanitize_filename(
+                    shorten_name(
+                        name_seq, max_len=title_length, title_clip_pos=title_clip_pos
+                    )
                 ),
                 wordsize_suffix,
                 suffix,
@@ -432,7 +489,7 @@ def selfdotplot(
 
             list_of_png_names.append(fig_name)
 
-    if multi and counter >= 1:
+    if filetype != 'html' and multi and counter >= 1:
         # finalize layout - margins & spacing between plots
         try:
             P.tight_layout(h_pad=0.02, w_pad=0.02)
@@ -470,6 +527,8 @@ def pairdotplot(
     alphabetic_sorting=False,
     convert_wobbles=False,
     filetype='png',
+    gff_color_dict=None,
+    gff_files=None,
     label_size=10,
     length_scaling=True,
     line_col_for='#000000',  # defalut black
@@ -492,7 +551,19 @@ def pairdotplot(
 ):
     """
     pairwise dotplot (all-against-all)
+
+    GFF annotations are shown as full-height/full-width shaded bands: a
+    feature on the x-axis sequence spans the full plot height, a feature on
+    the y-axis sequence spans the full plot width.
     """
+
+    # Initialize default gff_color_dict if None
+    if gff_color_dict is None:
+        gff_color_dict = {'others': ('grey', 1, 0)}
+
+    # Initialize default gff_files if None
+    if gff_files is None:
+        gff_files = []
 
     # read sequences
     seq_dict, sequences = read_seq(input_fasta)
@@ -568,6 +639,27 @@ def pairdotplot(
         text = 'Reducing label size for better visualization to %d\n' % label_size
         logging.info(text)
 
+    # read gff annotation data if provided for shading
+    if gff_files:
+        text = '\n%s\n\nReading %s GFF annotation files\n%s\n\n=> %s\n' % (
+            50 * '=',
+            len(gff_files),
+            28 * '-',
+            ', '.join(gff_files),
+        )
+        logging.info(text)
+        if prefix:
+            legend_prefix = prefix + '-Pairdotplot'
+        else:
+            legend_prefix = 'Pairdotplot'
+        feat_dict = read_gffs(
+            gff_files,
+            color_dict=gff_color_dict,
+            type_nuc=type_nuc,
+            prefix=legend_prefix,
+            filetype=filetype,
+        )
+
     y_label_rotation = 'vertical'
     # for cartesian coordinate system with mirrored y-axis: plot x labels below plot
     if mirror_y_axis:
@@ -599,10 +691,12 @@ def pairdotplot(
         nrows = 1
     figsize_x, figsize_y = calc_fig_ratio(ncols, nrows, plot_size)
 
-    P.cla()  # clear any prior graph
+    if filetype != 'html':
+        P.cla()  # clear any prior graph
+        if multi:
+            P.figure(figsize=(figsize_x, figsize_y))
     list_of_png_names = []
     if multi:
-        P.figure(figsize=(figsize_x, figsize_y))
         page_counter = 1
 
     # prepare LCS data file
@@ -714,6 +808,53 @@ def pairdotplot(
                 + '\n'
             )
 
+            # interactive HTML plotting with plotly (no collage)
+            if filetype == 'html':
+                if multi and counter == 1:
+                    logging.info(
+                        'Collage layout is not supported for HTML output - generating one interactive file per pair.'
+                    )
+                html_suffix = ''
+                if convert_wobbles:
+                    html_suffix += '_wobbles'
+                if substitution_count != 0:
+                    html_suffix += '_S%d' % substitution_count
+                fig_name = '%s%s-%d%s%s.%s' % (
+                    prefix,
+                    name_graph,
+                    counter,
+                    wordsize_suffix,
+                    html_suffix,
+                    filetype,
+                )
+                save_pairdotplot_html(
+                    name_one=name_one,
+                    name_two=name_two,
+                    len_one=len_one,
+                    len_two=len_two,
+                    x1=x1,
+                    y1=y1,
+                    x2=x2,
+                    y2=y2,
+                    fig_name=fig_name,
+                    aa_bp_unit=aa_bp_unit,
+                    line_col_for=line_col_for,
+                    line_col_rev=line_col_rev,
+                    line_width=line_width,
+                    mirror_y_axis=mirror_y_axis,
+                    title_length=title_length,
+                    title_clip_pos=title_clip_pos,
+                    label_size=label_size,
+                    x_label_pos_top=x_label_pos_top,
+                    seq_one=seq_one,
+                    seq_two=seq_two,
+                    gff_features_one=feat_dict.get(name_one) if gff_files else None,
+                    gff_features_two=feat_dict.get(name_two) if gff_files else None,
+                    gff_color_dict=gff_color_dict,
+                )
+                list_of_png_names.append(fig_name)
+                continue
+
             # Plotting with matplotlib
             #################################
 
@@ -733,6 +874,41 @@ def pairdotplot(
                 P.figure(figsize=(plot_size, plot_size))
 
                 ax = P.subplot(1, 1, 1)
+
+            # shade annotated regions if gff file(s) provided
+            # x-axis sequence (name_one) -> full-height vertical band
+            # y-axis sequence (name_two) -> full-width horizontal band
+            if gff_files:
+                for seq_name, features_len, is_x_axis in [
+                    (name_one, len_two, True),
+                    (name_two, len_one, False),
+                ]:
+                    if seq_name not in list(feat_dict.keys()):
+                        continue
+                    for item in feat_dict[seq_name]:
+                        feat_type, start, stop = item
+                        feat_color, strength, zoom = gff_color_dict[feat_type.lower()]
+                        start = max(0, start - zoom - 0.5)
+                        stop = stop + zoom + 0.5
+                        width = stop - start
+                        if is_x_axis:
+                            xy = (start, 0)
+                            rect_w, rect_h = width, features_len + 1
+                        else:
+                            xy = (0, start)
+                            rect_w, rect_h = features_len + 1, width
+                        ax.add_patch(
+                            patches.Rectangle(
+                                xy,
+                                rect_w,
+                                rect_h,
+                                edgecolor=None,
+                                linewidth=line_width + zoom,
+                                fill=True,
+                                facecolor=feat_color,
+                                alpha=strength,
+                            )
+                        )
 
             # collect lines
             lines = []
@@ -922,7 +1098,7 @@ def pairdotplot(
             break
 
     # save figure
-    if multi and counter >= 1:
+    if filetype != 'html' and multi and counter >= 1:
         # finalize layout - margins & spacing between plots
         try:
             P.tight_layout(h_pad=0.02, w_pad=0.02)
@@ -1346,6 +1522,39 @@ def polydotplot(
         logging.debug('\ncustom_similarity_dict\n\n' + str(custom_similarity_dict))
 
     logging.info(seq_text + '\n')
+
+    # interactive HTML plotting with plotly (no GFF/LCS/custom-matrix shading)
+    if filetype == 'html':
+        if gff_files:
+            logging.info(
+                'GFF shading is not supported for HTML output - skipping annotations.'
+            )
+        if lcs_shading or custom_shading:
+            logging.info(
+                'LCS/custom-matrix shading is not supported for HTML output - skipping shading.'
+            )
+        html_suffix = ''
+        if convert_wobbles:
+            html_suffix += '_wobbles'
+        if substitution_count != 0:
+            html_suffix += '_S%d' % substitution_count
+        fig_name = '%s%s%s%s.%s' % (prefix, name_graph, wordsize_suffix, html_suffix, filetype)
+        save_polydotplot_html(
+            sequences=sequences,
+            seq_dict=seq_dict,
+            data_dict=data_dict,
+            fig_name=fig_name,
+            aa_bp_unit=aa_bp_unit,
+            line_col_for=line_col_for,
+            line_col_rev=line_col_rev,
+            line_width=line_width,
+            mirror_y_axis=mirror_y_axis,
+            title_length=title_length,
+            title_clip_pos=title_clip_pos,
+            label_size=label_size,
+            plot_size=plot_size,
+        )
+        return [fig_name]
 
     if lcs_shading_ref == 2:
         color_bins = []
