@@ -51,6 +51,7 @@ def selfdotplot(
     title_clip_pos='B',
     title_length=float('Inf'),
     type_nuc=True,
+    teviewer_integration=False,
 ):
     """
     self-against-self dotplot
@@ -270,6 +271,7 @@ def selfdotplot(
                 seq=seq_one,
                 gff_features=feat_dict.get(seq_name) if gff_files else None,
                 gff_color_dict=gff_color_dict,
+                teviewer_integration=teviewer_integration,
             )
             list_of_png_names.append(fig_name)
             continue
@@ -548,6 +550,7 @@ def pairdotplot(
     title_length=float('Inf'),
     type_nuc=True,
     x_label_pos_top=True,
+    teviewer_integration=False,
 ):
     """
     pairwise dotplot (all-against-all)
@@ -851,6 +854,7 @@ def pairdotplot(
                     gff_features_one=feat_dict.get(name_one) if gff_files else None,
                     gff_features_two=feat_dict.get(name_two) if gff_files else None,
                     gff_color_dict=gff_color_dict,
+                    teviewer_integration=teviewer_integration,
                 )
                 list_of_png_names.append(fig_name)
                 continue
@@ -1170,6 +1174,7 @@ def polydotplot(
     type_nuc=True,
     user_matrix_print=True,
     x_label_pos_top=True,
+    teviewer_integration=False,
 ):
     """
     all-against-all dotplot
@@ -1553,6 +1558,7 @@ def polydotplot(
             title_clip_pos=title_clip_pos,
             label_size=label_size,
             plot_size=plot_size,
+            teviewer_integration=teviewer_integration,
         )
         return [fig_name]
 

@@ -72,6 +72,7 @@ def main():
     alphabetic_sorting = args.sort
     convert_wobbles = args.wobble_conversion
     filetype = args.filetype
+    teviewer_integration = args.teviewer_integration
     gff = args.gff
     gff_color_config_file = args.gff_color_config
     input_user_matrix_file = args.user_matrix_file
@@ -198,6 +199,7 @@ def main():
             title_length=title_length,
             type_nuc=type_nuc,
             line_width=line_width,
+            teviewer_integration=teviewer_integration,
         )
         if list_of_png_names:
             joiner = ',\n\t\t\t'
@@ -238,6 +240,7 @@ def main():
                 type_nuc=type_nuc,
                 x_label_pos_top=x_label_pos_top,
                 line_width=line_width,
+                teviewer_integration=teviewer_integration,
             )
             # t1 = time_track(t1)
         else:
@@ -273,6 +276,7 @@ def main():
                 title_length=title_length,
                 type_nuc=type_nuc,
                 line_width=line_width,
+                teviewer_integration=teviewer_integration,
             )
         if list_of_png_names:
             joiner = ',\n\t\t\t'
@@ -315,6 +319,7 @@ def main():
             type_nuc=type_nuc,
             user_matrix_print=user_matrix_print,
             line_width=line_width,
+            teviewer_integration=teviewer_integration,
         )
 
         if list_of_png_names:

@@ -8,8 +8,22 @@ Covers the core dotplot view (match lines with zoom/pan/hover/click) plus
 GFF annotation shading for the self and paired plotting modes. LCS shading,
 custom matrix shading, and collage layouts are not represented in HTML
 output; GFF shading is also not yet supported for the poly mode.
+
+Embedder contract: clicking a match line shows its position/sequence in an info
+box directly below the plot (Go-to buttons above the sequence text). Clicking
+one of those buttons (not the match line itself) sets ``window.__flexidotLastClick``
+in the page:
+    {x_seq, x_start, x_end, y_seq, y_start, y_end, length, unit, ts}
+(``y_seq``/``y_start``/``y_end`` are null for a single-axis "go to" request.)
+External tools (e.g. TEviewer) can poll this global (mirroring how they already
+poll other Plotly-embedded state) to match ``x_seq``/``y_seq`` against their own
+open records and jump to that region - only on the explicit button click, not on
+every match click. The Go-to buttons (and this global) only appear when Flexidot
+is run with ``--teviewer-integration``; standalone/browser use just shows the
+click position/sequence with no host-app affordances.
 """
 
+import json
 import logging
 
 import plotly.graph_objects as go
@@ -42,16 +56,19 @@ def _line_traces(
     aa_bp_unit='bp',
     seq_x=None,
     seq_y=None,
+    name_x='',
+    name_y='',
 ):
     """Build Plotly line traces for forward and reverse-complement matches.
 
     All segments of one color are combined into a single trace (separated by
     None) so plots with many matches stay responsive. Each segment carries
-    customdata (x start/end, y start/end, length, aligned sequence text) used
-    for the hover tooltip and the click-to-reveal sequence box.
+    customdata (x/y sequence name, x/y start/end, length, aligned sequence
+    text, orientation) used for the hover tooltip and the click-to-reveal
+    sequence box / ``window.__flexidotLastClick`` (see module docstring).
     """
     traces = []
-    for x_lines, y_lines, col, name in [
+    for x_lines, y_lines, col, orientation in [
         (x_lists_rc, y_lists_rc, line_col_rev, 'reverse complement'),
         (x_lists, y_lists, line_col_for, 'forward'),
     ]:
@@ -62,28 +79,31 @@ def _line_traces(
             x0, x1 = x_lines[ldx][0], x_lines[ldx][-1]
             y0, y1 = y_lines[ldx][0], y_lines[ldx][-1]
             length = abs(int(x1) - int(x0)) + 1
-            seq_text = 'X %d-%d: %s\nY %d-%d: %s' % (
+            point = [
                 x0,
                 x1,
-                _extract_seq(seq_x, x0, x1) or 'n/a',
                 y0,
                 y1,
+                length,
+                name_x,
+                name_y,
+                _extract_seq(seq_x, x0, x1) or 'n/a',
                 _extract_seq(seq_y, y0, y1) or 'n/a',
-            )
-            point = [x0, x1, y0, y1, length, seq_text]
+                orientation,
+            ]
             xs += [x0, x1, None]
             ys += [y0, y1, None]
             customdata += [point, point, point]
         traces.append(
-            go.Scattergl(
+            go.Scatter(
                 x=xs,
                 y=ys,
                 mode='lines',
                 line=dict(color=col, width=line_width),
-                name=name,
+                name=orientation,
                 customdata=customdata,
                 hovertemplate=(
-                    '<b>%s match</b><br>' % name.title()
+                    '<b>%s match</b><br>' % orientation.title()
                     + 'X: %{customdata[0]}-%{customdata[1]}<br>'
                     + 'Y: %{customdata[2]}-%{customdata[3]}<br>'
                     + 'Length: %{customdata[4]} '
@@ -96,22 +116,79 @@ def _line_traces(
     return traces
 
 
-def _click_seq_postscript(div_id=_DIV_ID):
-    """JS injected after the plot: shows the clicked match's aligned sequence in a box below it."""
-    return """
-var plotDiv = document.getElementById('%(div_id)s');
-var seqBox = document.createElement('div');
-seqBox.id = '%(div_id)s-seqbox';
-seqBox.style.cssText = 'font-family: monospace; font-size: 13px; white-space: pre-wrap; word-break: break-all; padding: 10px 14px; margin-top: 10px; border: 1px solid #ccc; border-radius: 4px; background: #f7f7f7; min-height: 1.4em;';
-seqBox.innerText = 'Click a match line to show its aligned sequence.';
-plotDiv.parentNode.insertBefore(seqBox, plotDiv.nextSibling);
-plotDiv.on('plotly_click', function(evt) {
-    var pt = evt.points[0];
-    var cd = pt.customdata;
-    if (!cd) { return; }
-    seqBox.innerText = cd[5];
-});
-""" % {'div_id': div_id}
+def _click_seq_postscript(unit='bp', div_id=_DIV_ID, show_goto_buttons=False):
+    """JS injected after the plot: shows the clicked match's position/sequence in an
+    info box directly below the plot. When ``show_goto_buttons`` is True (only set
+    when Flexidot is launched with ``--teviewer-integration``), a "Go to <seq>
+    <start>-<end>" button per axis is also shown (above the sequence text) that
+    publishes ``window.__flexidotLastClick`` for the host app (e.g. TEviewer) to
+    poll. Standalone/browser use never shows these buttons or touches that global."""
+    if show_goto_buttons:
+        make_button_fn = (
+            """
+    function makeGoToButton(label, seq, start, end) {
+        var btn = document.createElement('button');
+        btn.textContent = label;
+        btn.style.cssText = 'margin: 0 8px 8px 0; font-family: monospace; font-size: 12px; padding: 2px 8px; cursor: pointer;';
+        btn.addEventListener('click', function() {
+            window.__flexidotLastClick = {
+                x_seq: seq, x_start: start, x_end: end,
+                y_seq: null, y_start: start, y_end: end,
+                length: Math.abs(end - start) + 1, unit: %s,
+                ts: Date.now()
+            };
+            btn.textContent = 'Sent \\u2192 ' + label;
+            setTimeout(function() { btn.textContent = label; }, 1200);
+        });
+        return btn;
+    }
+    """
+            % json.dumps(unit)
+        )
+        buttons_js = """
+        var buttons = document.createElement('div');
+        buttons.appendChild(
+            makeGoToButton('Go to ' + cd[5] + ' ' + cd[0] + '-' + cd[1], cd[5], cd[0], cd[1])
+        );
+        buttons.appendChild(
+            makeGoToButton('Go to ' + cd[6] + ' ' + cd[2] + '-' + cd[3], cd[6], cd[2], cd[3])
+        );
+        infoBox.appendChild(buttons);
+        """
+    else:
+        make_button_fn = ''
+        buttons_js = ''
+
+    template = (
+        """
+(function() {
+    var plotDiv = document.getElementById('%(div_id)s');
+    var infoBox = document.createElement('div');
+    infoBox.id = '%(div_id)s-infobox';
+    infoBox.style.cssText = 'font-family: monospace; font-size: 13px; padding: 10px 14px; margin-top: 6px; border: 1px solid #ccc; border-radius: 4px; background: #f7f7f7;';
+    infoBox.innerText = 'Click a match line to show its position and sequence.';
+    plotDiv.parentNode.insertBefore(infoBox, plotDiv.nextSibling);
+"""
+        + make_button_fn
+        + """
+    plotDiv.on('plotly_click', function(evt) {
+        var pt = evt.points[0];
+        var cd = pt.customdata;
+        if (!cd) { return; }
+        infoBox.innerHTML = '';
+"""
+        + buttons_js
+        + """
+        var text = document.createElement('div');
+        text.style.cssText = 'white-space: pre-wrap; word-break: break-all;';
+        text.textContent = 'X ' + cd[5] + ' ' + cd[0] + '-' + cd[1] + ': ' + cd[7] +
+            '\\nY ' + cd[6] + ' ' + cd[2] + '-' + cd[3] + ': ' + cd[8];
+        infoBox.appendChild(text);
+    });
+})();
+"""
+    )
+    return template % {'div_id': div_id}
 
 
 def _self_gff_shapes(features, gff_color_dict, length_seq):
@@ -200,6 +277,7 @@ def save_selfdotplot_html(
     seq=None,
     gff_features=None,
     gff_color_dict=None,
+    teviewer_integration=False,
 ):
     """Render an interactive self-dotplot to an HTML file."""
     traces = _line_traces(
@@ -213,6 +291,8 @@ def save_selfdotplot_html(
         aa_bp_unit=aa_bp_unit,
         seq_x=seq,
         seq_y=seq,
+        name_x=name_seq,
+        name_y=name_seq,
     )
     fig = go.Figure(data=traces)
 
@@ -253,7 +333,9 @@ def save_selfdotplot_html(
         fig_name,
         include_plotlyjs=True,
         div_id=_DIV_ID,
-        post_script=_click_seq_postscript(),
+        post_script=_click_seq_postscript(
+            unit=aa_bp_unit, show_goto_buttons=teviewer_integration
+        ),
     )
     logging.info('Interactive HTML selfdotplot written to %s' % fig_name)
     return fig_name
@@ -283,6 +365,7 @@ def save_pairdotplot_html(
     gff_features_one=None,
     gff_features_two=None,
     gff_color_dict=None,
+    teviewer_integration=False,
 ):
     """Render an interactive paired dotplot to an HTML file.
 
@@ -301,6 +384,8 @@ def save_pairdotplot_html(
         aa_bp_unit=aa_bp_unit,
         seq_x=seq_one,
         seq_y=seq_two,
+        name_x=name_one,
+        name_y=name_two,
     )
     fig = go.Figure(data=traces)
 
@@ -344,7 +429,9 @@ def save_pairdotplot_html(
         fig_name,
         include_plotlyjs=True,
         div_id=_DIV_ID,
-        post_script=_click_seq_postscript(),
+        post_script=_click_seq_postscript(
+            unit=aa_bp_unit, show_goto_buttons=teviewer_integration
+        ),
     )
     logging.info('Interactive HTML pairdotplot written to %s' % fig_name)
     return fig_name
@@ -364,6 +451,7 @@ def save_polydotplot_html(
     title_clip_pos,
     label_size,
     plot_size,
+    teviewer_integration=False,
 ):
     """Render an interactive all-against-all polydotplot grid to a single HTML file."""
     n = len(sequences)
@@ -375,6 +463,7 @@ def save_polydotplot_html(
     ]
     lengths = [len(seq_dict[s].seq) for s in sequences]
     seqs = [seq_dict[s].seq for s in sequences]
+    record_ids = [seq_dict[s].id for s in sequences]
 
     fig = make_subplots(
         rows=n,
@@ -399,6 +488,8 @@ def save_polydotplot_html(
                 aa_bp_unit=aa_bp_unit,
                 seq_x=seqs[jdx],
                 seq_y=seqs[idx],
+                name_x=record_ids[jdx],
+                name_y=record_ids[idx],
             ):
                 fig.add_trace(trace, row=row, col=col)
             fig.update_xaxes(range=[0, lengths[jdx] + 1], row=row, col=col, **_AXIS_BOX_STYLE)
@@ -421,6 +512,8 @@ def save_polydotplot_html(
                     aa_bp_unit=aa_bp_unit,
                     seq_x=seqs[idx],
                     seq_y=seqs[jdx],
+                    name_x=record_ids[idx],
+                    name_y=record_ids[jdx],
                 ):
                     fig.add_trace(trace, row=row_m, col=col_m)
                 fig.update_xaxes(
@@ -454,7 +547,9 @@ def save_polydotplot_html(
         fig_name,
         include_plotlyjs=True,
         div_id=_DIV_ID,
-        post_script=_click_seq_postscript(),
+        post_script=_click_seq_postscript(
+            unit=aa_bp_unit, show_goto_buttons=teviewer_integration
+        ),
     )
     logging.info('Interactive HTML polydotplot written to %s' % fig_name)
     return fig_name

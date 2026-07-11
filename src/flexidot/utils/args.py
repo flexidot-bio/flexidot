@@ -310,5 +310,13 @@ def parse_args():
         version='%(prog)s {version}'.format(version=__version__),
     )
     parser.add_argument('--logfile', default=None, help='Name of log file')
+    parser.add_argument(
+        '--teviewer-integration',
+        action='store_true',
+        default=False,
+        help="Only for html output: add 'Go to <seq> <start>-<end>' buttons to the "
+        'click info box that a host application (e.g. TEviewer) can react to via '
+        'window.__flexidotLastClick. Off by default so standalone/browser use stays plain.',
+    )
 
     return parser.parse_args()
