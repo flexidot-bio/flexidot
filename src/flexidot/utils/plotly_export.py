@@ -126,17 +126,27 @@ def _click_seq_postscript(unit='bp', div_id=_DIV_ID, show_goto_buttons=False):
     if show_goto_buttons:
         make_button_fn = (
             """
-    function makeGoToButton(label, seq, start, end) {
+    function makeGoToButton(label, axis, seq, start, end) {
         var btn = document.createElement('button');
         btn.textContent = label;
         btn.style.cssText = 'margin: 0 8px 8px 0; font-family: monospace; font-size: 12px; padding: 2px 8px; cursor: pointer;';
         btn.addEventListener('click', function() {
-            window.__flexidotLastClick = {
-                x_seq: seq, x_start: start, x_end: end,
-                y_seq: null, y_start: start, y_end: end,
+            var payload = {
+                x_seq: null, x_start: null, x_end: null,
+                y_seq: null, y_start: null, y_end: null,
                 length: Math.abs(end - start) + 1, unit: %s,
                 ts: Date.now()
             };
+            if (axis === 'x') {
+                payload.x_seq = seq;
+                payload.x_start = start;
+                payload.x_end = end;
+            } else {
+                payload.y_seq = seq;
+                payload.y_start = start;
+                payload.y_end = end;
+            }
+            window.__flexidotLastClick = payload;
             btn.textContent = 'Sent \\u2192 ' + label;
             setTimeout(function() { btn.textContent = label; }, 1200);
         });
@@ -148,10 +158,10 @@ def _click_seq_postscript(unit='bp', div_id=_DIV_ID, show_goto_buttons=False):
         buttons_js = """
         var buttons = document.createElement('div');
         buttons.appendChild(
-            makeGoToButton('Go to ' + cd[5] + ' ' + cd[0] + '-' + cd[1], cd[5], cd[0], cd[1])
+            makeGoToButton('Go to ' + cd[5] + ' ' + cd[0] + '-' + cd[1], 'x', cd[5], cd[0], cd[1])
         );
         buttons.appendChild(
-            makeGoToButton('Go to ' + cd[6] + ' ' + cd[2] + '-' + cd[3], cd[6], cd[2], cd[3])
+            makeGoToButton('Go to ' + cd[6] + ' ' + cd[2] + '-' + cd[3], 'y', cd[6], cd[2], cd[3])
         );
         infoBox.appendChild(buttons);
         """
@@ -163,6 +173,7 @@ def _click_seq_postscript(unit='bp', div_id=_DIV_ID, show_goto_buttons=False):
         """
 (function() {
     var plotDiv = document.getElementById('%(div_id)s');
+    if (!plotDiv) { return; }
     var infoBox = document.createElement('div');
     infoBox.id = '%(div_id)s-infobox';
     infoBox.style.cssText = 'font-family: monospace; font-size: 13px; padding: 10px 14px; margin-top: 6px; border: 1px solid #ccc; border-radius: 4px; background: #f7f7f7;';
