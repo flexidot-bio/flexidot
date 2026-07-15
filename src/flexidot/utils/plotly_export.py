@@ -32,7 +32,12 @@ from plotly.subplots import make_subplots
 from flexidot.utils.utils import shorten_name, unicode_name
 
 # solid box border around the plot area, similar to matplotlib's default axes spines
-_AXIS_BOX_STYLE = dict(showline=True, linewidth=1, linecolor='black', mirror=True)
+_AXIS_BOX_STYLE = {
+    'showline': True,
+    'linewidth': 1,
+    'linecolor': 'black',
+    'mirror': True,
+}
 
 _DIV_ID = 'flexidot-dotplot'
 
@@ -99,7 +104,7 @@ def _line_traces(
                 x=xs,
                 y=ys,
                 mode='lines',
-                line=dict(color=col, width=line_width),
+                line={'color': col, 'width': line_width},
                 name=orientation,
                 customdata=customdata,
                 hovertemplate=(
@@ -210,17 +215,17 @@ def _self_gff_shapes(features, gff_color_dict, length_seq):
         start_c = max(0, start - zoom - 0.5)
         stop_c = min(length_seq + 1, stop + zoom + 0.5)
         shapes.append(
-            dict(
-                type='rect',
-                x0=start_c,
-                x1=stop_c,
-                y0=start_c,
-                y1=stop_c,
-                fillcolor=feat_color,
-                opacity=strength,
-                line=dict(width=0),
-                layer='below',
-            )
+            {
+                'type': 'rect',
+                'x0': start_c,
+                'x1': stop_c,
+                'y0': start_c,
+                'y1': stop_c,
+                'fillcolor': feat_color,
+                'opacity': strength,
+                'line': {'width': 0},
+                'layer': 'below',
+            }
         )
     return shapes
 
@@ -237,34 +242,34 @@ def _pair_gff_shapes(features_one, features_two, gff_color_dict, len_one, len_tw
         start_c = max(0, start - zoom - 0.5)
         stop_c = stop + zoom + 0.5
         shapes.append(
-            dict(
-                type='rect',
-                x0=start_c,
-                x1=stop_c,
-                y0=0,
-                y1=len_two + 1,
-                fillcolor=feat_color,
-                opacity=strength,
-                line=dict(width=0),
-                layer='below',
-            )
+            {
+                'type': 'rect',
+                'x0': start_c,
+                'x1': stop_c,
+                'y0': 0,
+                'y1': len_two + 1,
+                'fillcolor': feat_color,
+                'opacity': strength,
+                'line': {'width': 0},
+                'layer': 'below',
+            }
         )
     for feat_type, start, stop in features_two:
         feat_color, strength, zoom = gff_color_dict[feat_type.lower()]
         start_c = max(0, start - zoom - 0.5)
         stop_c = stop + zoom + 0.5
         shapes.append(
-            dict(
-                type='rect',
-                x0=0,
-                x1=len_one + 1,
-                y0=start_c,
-                y1=stop_c,
-                fillcolor=feat_color,
-                opacity=strength,
-                line=dict(width=0),
-                layer='below',
-            )
+            {
+                'type': 'rect',
+                'x0': 0,
+                'x1': len_one + 1,
+                'y0': start_c,
+                'y1': stop_c,
+                'fillcolor': feat_color,
+                'opacity': strength,
+                'line': {'width': 0},
+                'layer': 'below',
+            }
         )
     return shapes
 
@@ -320,7 +325,7 @@ def save_selfdotplot_html(
         xaxis_title='[%s]' % aa_bp_unit,
         yaxis_title='[%s]' % aa_bp_unit,
         template='plotly_white',
-        font=dict(size=label_size),
+        font={'size': label_size},
     )
     fig.update_xaxes(range=[0, length_seq + 1], constrain='domain', **_AXIS_BOX_STYLE)
     if mirror_y_axis:
@@ -420,7 +425,7 @@ def save_pairdotplot_html(
         xaxis_title=x_title,
         yaxis_title=y_title,
         template='plotly_white',
-        font=dict(size=label_size),
+        font={'size': label_size},
     )
 
     x_range = [0, len_one + 1]
@@ -547,7 +552,7 @@ def save_polydotplot_html(
 
     fig.update_layout(
         template='plotly_white',
-        font=dict(size=label_size),
+        font={'size': label_size},
         showlegend=False,
         height=max(600, plot_size * 100),
         width=max(600, plot_size * 100),
