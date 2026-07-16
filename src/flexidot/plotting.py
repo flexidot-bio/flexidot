@@ -1543,7 +1543,13 @@ def polydotplot(
             html_suffix += '_wobbles'
         if substitution_count != 0:
             html_suffix += '_S%d' % substitution_count
-        fig_name = '%s%s%s%s.%s' % (prefix, name_graph, wordsize_suffix, html_suffix, filetype)
+        fig_name = '%s%s%s%s.%s' % (
+            prefix,
+            name_graph,
+            wordsize_suffix,
+            html_suffix,
+            filetype,
+        )
         save_polydotplot_html(
             sequences=sequences,
             seq_dict=seq_dict,

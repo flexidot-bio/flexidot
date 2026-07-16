@@ -129,8 +129,7 @@ def _click_seq_postscript(unit='bp', div_id=_DIV_ID, show_goto_buttons=False):
     publishes ``window.__flexidotLastClick`` for the host app (e.g. TEviewer) to
     poll. Standalone/browser use never shows these buttons or touches that global."""
     if show_goto_buttons:
-        make_button_fn = (
-            """
+        make_button_fn = """
     function makeGoToButton(label, axis, seq, start, end) {
         var btn = document.createElement('button');
         btn.textContent = label;
@@ -157,9 +156,7 @@ def _click_seq_postscript(unit='bp', div_id=_DIV_ID, show_goto_buttons=False):
         });
         return btn;
     }
-    """
-            % json.dumps(unit)
-        )
+    """ % json.dumps(unit)
         buttons_js = """
         var buttons = document.createElement('div');
         buttons.appendChild(
@@ -408,16 +405,24 @@ def save_pairdotplot_html(
     if gff_features_one or gff_features_two:
         fig.update_layout(
             shapes=_pair_gff_shapes(
-                gff_features_one or [], gff_features_two or [], gff_color_dict, len_one, len_two
+                gff_features_one or [],
+                gff_features_two or [],
+                gff_color_dict,
+                len_one,
+                len_two,
             )
         )
 
     x_title = (
-        unicode_name(shorten_name(name_one, max_len=title_length, title_clip_pos=title_clip_pos))
+        unicode_name(
+            shorten_name(name_one, max_len=title_length, title_clip_pos=title_clip_pos)
+        )
         + ' [%s]' % aa_bp_unit
     )
     y_title = (
-        unicode_name(shorten_name(name_two, max_len=title_length, title_clip_pos=title_clip_pos))
+        unicode_name(
+            shorten_name(name_two, max_len=title_length, title_clip_pos=title_clip_pos)
+        )
         + ' [%s]' % aa_bp_unit
     )
     fig.update_layout(
@@ -438,7 +443,11 @@ def save_pairdotplot_html(
         **_AXIS_BOX_STYLE,
     )
     fig.update_yaxes(
-        range=y_range, constrain='domain', scaleanchor='x', scaleratio=1, **_AXIS_BOX_STYLE
+        range=y_range,
+        constrain='domain',
+        scaleanchor='x',
+        scaleratio=1,
+        **_AXIS_BOX_STYLE,
     )
 
     fig.write_html(
@@ -473,7 +482,9 @@ def save_polydotplot_html(
     n = len(sequences)
     names = [
         unicode_name(
-            shorten_name(seq_dict[s].id, max_len=title_length, title_clip_pos=title_clip_pos)
+            shorten_name(
+                seq_dict[s].id, max_len=title_length, title_clip_pos=title_clip_pos
+            )
         )
         for s in sequences
     ]
@@ -508,11 +519,17 @@ def save_polydotplot_html(
                 name_y=record_ids[idx],
             ):
                 fig.add_trace(trace, row=row, col=col)
-            fig.update_xaxes(range=[0, lengths[jdx] + 1], row=row, col=col, **_AXIS_BOX_STYLE)
+            fig.update_xaxes(
+                range=[0, lengths[jdx] + 1], row=row, col=col, **_AXIS_BOX_STYLE
+            )
             if mirror_y_axis:
-                fig.update_yaxes(range=[0, lengths[idx] + 1], row=row, col=col, **_AXIS_BOX_STYLE)
+                fig.update_yaxes(
+                    range=[0, lengths[idx] + 1], row=row, col=col, **_AXIS_BOX_STYLE
+                )
             else:
-                fig.update_yaxes(range=[lengths[idx] + 1, 0], row=row, col=col, **_AXIS_BOX_STYLE)
+                fig.update_yaxes(
+                    range=[lengths[idx] + 1, 0], row=row, col=col, **_AXIS_BOX_STYLE
+                )
 
             if idx != jdx:
                 # mirrored cell (swap x/y so the grid is symmetric)
@@ -537,11 +554,17 @@ def save_polydotplot_html(
                 )
                 if mirror_y_axis:
                     fig.update_yaxes(
-                        range=[0, lengths[jdx] + 1], row=row_m, col=col_m, **_AXIS_BOX_STYLE
+                        range=[0, lengths[jdx] + 1],
+                        row=row_m,
+                        col=col_m,
+                        **_AXIS_BOX_STYLE,
                     )
                 else:
                     fig.update_yaxes(
-                        range=[lengths[jdx] + 1, 0], row=row_m, col=col_m, **_AXIS_BOX_STYLE
+                        range=[lengths[jdx] + 1, 0],
+                        row=row_m,
+                        col=col_m,
+                        **_AXIS_BOX_STYLE,
                     )
 
     # sequence name labels along the bottom row and left column
